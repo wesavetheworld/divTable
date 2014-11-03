@@ -69,4 +69,6 @@ table = divTableMaker( table_test, {
 
 ##4. Enjoy your table!
 
-![Image of Yaktocat](https://github.com/TheGr8Nik/divTable/blob/master/images/example.png)
+![Image of div table](https://github.com/TheGr8Nik/divTable/blob/master/images/example.png)
+
+[![Donate](https://www.paypalobjects.com/en_US/CH/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=K2VKE9L3VEX6G)
