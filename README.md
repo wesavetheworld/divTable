@@ -1,7 +1,7 @@
 Description
 ===========
 The divTable is a div based table. 
-It provide the possibility to inline edit your rows with input fields and selector.
+It provide the possibility to inline edit your rows with input fields and selectors.
 
 ####_Easy to define, powerful to use!_
 
