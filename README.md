@@ -69,4 +69,4 @@ table = divTableMaker( table_test, {
 
 ##4. Enjoy your table!
 
-![Image of Yaktocat](https://TheGr8Nik.github.com/divTable/images/example.png)
+![Image of Yaktocat](https://github.com/TheGr8Nik/divTable/blob/master/images/example.png)
