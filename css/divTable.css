@@ -40,7 +40,7 @@
   line-height : 24px;
   border : 0px;
   color  : #fff;
-  background-color : #2E79D6;
+  background-color : #3498db;
 }
 
 .div-header .div-cell {
@@ -62,7 +62,7 @@
 }
 
 .div-header-filter .div-cell {
-  border-right : 1px solid #2E79D6;
+  border-right : 1px solid #3498db;
   padding : 4px;
 }
 
@@ -155,7 +155,7 @@
   top    : 0px;
   right  : 0px;
   height : 24px;
-  background-color : #2E79D6;
+  background-color : #3498db;
 }
 
 .div-filter > span {

@@ -117,6 +117,15 @@ DivTable.prototype._loadOptions = function ( options ) {
       
       onChange    : function ( name, new_val, row ) {},
       onSelectRow : function ( row ) {},
+      
+      onFooterClick : function ( name ) {
+        if ( name === 'plus' ) {
+          this.div_table( 'newRow' );
+        }
+        else if ( name === 'trash' ) {
+          this.div_table( 'deleteSelectedRow' );
+        }
+      }
     };
   
   for ( key in default_options ) {
