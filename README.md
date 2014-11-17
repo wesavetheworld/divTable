@@ -71,4 +71,26 @@ table = divTableMaker( table_test, {
 
 ![Image of div table](https://github.com/TheGr8Nik/divTable/blob/master/images/example.png)
 
+
+#Advanced Topics
+##1. Advanced edit
+```javascript
+advancedEdit : {
+  hide   : [],
+  edit   : {},
+  depend : 'select',
+  values : [{
+    value : '0',
+    hide  : [ 'checkbox' ],
+  },{
+    value : '1',
+    hide  : [ 'number', 'text' ],
+    edit  : {
+      'checkbox' : [ '1', '2', '3', '4', '5' ]
+    }
+  }]
+}
+```
+
+
 [![Donate](https://www.paypalobjects.com/en_US/CH/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=K2VKE9L3VEX6G)
