@@ -8,7 +8,7 @@
 	<link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
 	<link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
 	<link rel="stylesheet" type="text/css" href="stylesheets/divTable.css" media="screen">
-  <script type="text/javascript" src="javascripts/divTable.js" ></script>
+	<script type="text/javascript" src="javascripts/divTable.js" ></script>
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
@@ -37,24 +37,24 @@
 			<p>Base table:</p>
 			<style>
 				#baseTable {
-				  width  : 100%;
-				  height : 300px;
+					width  : 100%;
+					height : 300px;
 				}
 
 				#baseTable .cell-0 {
-				  width : 20%;
+					width : 20%;
 				}
 				#baseTable .cell-1 {
-				  width : 20%;
+					width : 20%;
 				}
 				#baseTable .cell-2 {
-				  width : 20%;
+					width : 20%;
 				}
 				#baseTable .cell-3 {
-				  width : 20%;
+					width : 20%;
 				}
 				#baseTable .cell-4 {
-				  width : 20%;
+					width : 20%;
 				}
 			</style>
 			<div id="baseTable"></div>
@@ -88,27 +88,41 @@
 				baseTable = document.getElementById( 'baseTable' );
 
 			table = divTableMaker( baseTable, {
-			  columns : [{
-			    name : 'text',
-			    text : 'Text',
-			    edit : 'text'
-			  },{
-			    name : 'number',
-			    text : 'Number',
-			    edit : 'number'
-			  },{
-			    name : 'select',
-			    text : 'Select',
-			    edit : [ '0', '1', '2' ]
-			  },{
-			    name : 'advancedSelect',
-			    text : 'Advanced Select',
-			    edit : { 1 : 'first', 2 : 'second', 3 : 'third' }
-			  },{
-			    name : 'checkbox',
-			    text : 'Checkbox',
-			    edit : 'checkbox'
-			  }]
+				columns : [{
+					name : 'text',
+					text : 'Text',
+					edit : 'text'
+				},{
+					name : 'number',
+					text : 'Number',
+					edit : 'number'
+				},{
+					name : 'select',
+					text : 'Select',
+					edit : [ '0', '1', '2' ]
+				},{
+					name : 'advancedSelect',
+					text : 'Advanced Select',
+					edit : { 1 : 'first', 2 : 'second', 3 : 'third' }
+				},{
+					name : 'checkbox',
+					text : 'Checkbox',
+					edit : 'checkbox'
+				}],
+
+				onFooterClick : function ( name ) {
+			
+					if ( name === 'plus' ) {
+						this.bag_table( 'newRow' );
+					}
+					else if ( name === 'trash' ) {
+						this.bag_table( 'deleteEditRow' );
+					}
+					else if ( name === 'refresh' ) {
+						this.bag_table( 'updateTable' );
+					}
+
+				}
 			});
 		</script>
 	</body>
