@@ -83,47 +83,48 @@
 		</div>
 	</div>
 
-		<script>
-			var table
-				baseTable = document.getElementById( 'baseTable' );
+	<script>
+		var table
+			baseTable = document.getElementById( 'baseTable' );
 
-			table = divTableMaker( baseTable, {
-				columns : [{
-					name : 'text',
-					text : 'Text',
-					edit : 'text'
-				},{
-					name : 'number',
-					text : 'Number',
-					edit : 'number'
-				},{
-					name : 'select',
-					text : 'Select',
-					edit : [ '0', '1', '2' ]
-				},{
-					name : 'advancedSelect',
-					text : 'Advanced Select',
-					edit : { 1 : 'first', 2 : 'second', 3 : 'third' }
-				},{
-					name : 'checkbox',
-					text : 'Checkbox',
-					edit : 'checkbox'
-				}],
+		table = divTableMaker( baseTable, {
+			columns : [{
+				name : 'text',
+				text : 'Text',
+				edit : 'text'
+			},{
+				name : 'number',
+				text : 'Number',
+				edit : 'number'
+			},{
+				name : 'select',
+				text : 'Select',
+				edit : [ '0', '1', '2' ]
+			},{
+				name : 'advancedSelect',
+				text : 'Advanced Select',
+				edit : { 1 : 'first', 2 : 'second', 3 : 'third' }
+			},{
+				name : 'checkbox',
+				text : 'Checkbox',
+				edit : 'checkbox'
+			}],
 
-				onFooterClick : function ( name ) {
-			
-					if ( name === 'plus' ) {
-						this.bag_table( 'newRow' );
-					}
-					else if ( name === 'trash' ) {
-						this.bag_table( 'deleteEditRow' );
-					}
-					else if ( name === 'refresh' ) {
-						this.bag_table( 'updateTable' );
-					}
-
+			onFooterClick : function ( name ) {
+		
+				if ( name === 'plus' ) {
+					this.div_table( 'newRow' );
 				}
-			});
-		</script>
+				else if ( name === 'trash' ) {
+					this.div_table( 'deleteEditRow' );
+				}
+				else if ( name === 'refresh' ) {
+					this.div_table( 'updateTable' );
+				}
+
+			}
+		});
+	</script>
+	
 	</body>
 </html>
