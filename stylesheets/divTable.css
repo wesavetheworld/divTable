@@ -177,6 +177,7 @@
   text-indent: -99999px;
   overflow: hidden;
   background-repeat: no-repeat;
+  background-image : url(images/ui-icons_fff_256x240.png);
   width  : 16px;
   height : 16px;
 }
