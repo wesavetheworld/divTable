@@ -5,6 +5,7 @@ It provide the possibility to inline edit your rows with input fields and select
 
 ####_Easy to define, powerful to use!_
 
+#####[Try Me](https://thegr8nik.github.io/divTable/)
 How use divTable
 ================
 
