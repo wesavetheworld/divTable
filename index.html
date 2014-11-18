@@ -59,6 +59,31 @@
 			</style>
 			<div id="baseTable"></div>
 
+			<p>Advanced edit table:</p>
+			<style>
+				#advTable {
+					width  : 100%;
+					height : 300px;
+				}
+
+				#advTable .cell-0 {
+					width : 20%;
+				}
+				#advTable .cell-1 {
+					width : 20%;
+				}
+				#advTable .cell-2 {
+					width : 20%;
+				}
+				#advTable .cell-3 {
+					width : 20%;
+				}
+				#advTable .cell-4 {
+					width : 20%;
+				}
+			</style>
+			<div id="advTable"></div>
+
 			<h3>
 			<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
 
@@ -84,8 +109,9 @@
 	</div>
 
 	<script>
-		var table
-			baseTable = document.getElementById( 'baseTable' );
+		var table,
+			baseTable = document.getElementById( 'baseTable' ),
+			advTable  = document.getElementById( 'advTable'  );
 
 		table = divTableMaker( baseTable, {
 			columns : [{
@@ -124,7 +150,61 @@
 
 			}
 		});
+
+
+		table = divTableMaker( advTable, {
+			columns : [{
+				name : 'text',
+				text : 'Text',
+				edit : 'text'
+			},{
+				name : 'number',
+				text : 'Number',
+				edit : 'number'
+			},{
+				name : 'select',
+				text : 'Select',
+				edit : [ '0', '1', '2' ]
+			},{
+				name : 'advancedSelect',
+				text : 'Advanced Select',
+				edit : { 1 : 'first', 2 : 'second', 3 : 'third' }
+			},{
+				name : 'checkbox',
+				text : 'Checkbox',
+				edit : 'checkbox'
+			}],
+			advancedEdit : {
+				hide   : [],
+				edit   : {},
+				depend : 'select',
+				values : [{
+					value : '0',
+					hide  : [ 'checkbox' ],
+				},{
+					value : '1',
+					hide  : [ 'number', 'text' ],
+					edit  : {
+						'checkbox' : [ '1', '2', '3', '4', '5' ]
+					}
+				}]
+			},
+
+			onFooterClick : function ( name ) {
+		
+				if ( name === 'plus' ) {
+					this.div_table( 'newRow' );
+				}
+				else if ( name === 'trash' ) {
+					this.div_table( 'deleteEditRow' );
+				}
+				else if ( name === 'refresh' ) {
+					this.div_table( 'updateTable' );
+				}
+
+			}
+		});
 	</script>
-	
+
 	</body>
 </html>
