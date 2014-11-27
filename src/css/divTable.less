@@ -3,9 +3,7 @@
  */
 .div-table,
 .div-table * {
-  -webkit-box-sizing : border-box;
-     -moz-box-sizing : border-box;
-          box-sizing : border-box;
+	box-sizing : border-box;
   font-family : "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size : 12px;
 }
@@ -20,8 +18,8 @@
   overflow : hidden;
 }
 
-.div-cell > * {
-  padding-left : 5px;
+.div-cell .cell-val {
+  padding-left : 2px;
   white-space : nowrap;
 }
 
@@ -40,7 +38,7 @@
   line-height : 24px;
   border : 0px;
   color  : #fff;
-  background-color : #3498db;
+  background-color : #2E79D6;
 }
 
 .div-header .div-cell {
@@ -62,7 +60,7 @@
 }
 
 .div-header-filter .div-cell {
-  border-right : 1px solid #3498db;
+  border-right : 1px solid #2E79D6;
   padding : 4px;
 }
 
@@ -75,16 +73,14 @@
 }
 
 .div-body {
-  height :         calc(100% - 49px);   /* header: 24px + footer: 25px = 49px */
-  height : -webkit-calc(100% - 49px);
+  height :  ~'calc(100% - 49px)';   /* header: 24px + footer: 25px = 49px */
   display : block;
   overflow-x : hidden;
   overflow-y : scroll;
 }
 
 .filter .div-body {
-  height :         calc(100% - 75px);   /* header: 24px + filter: 26 + footer: 25px = 75px */
-  height : -webkit-calc(100% - 75px);
+  height : ~'calc(100% - 75px)';   /* header: 24px + filter: 26 + footer: 25px = 75px */
   display : block;
   overflow-x : hidden;
   overflow-y : scroll;
@@ -114,6 +110,7 @@
   width   : 100%;
   height  : 100%;
   margin  : 0px;
+  padding : 0px;
   border  : 0px;
 }
 
@@ -129,9 +126,7 @@
   border : 0px;
   position: relative;
   top: 50%;
-  -webkit-transform: translateY(-50%);
-      -ms-transform: translateY(-50%);
-          transform: translateY(-50%);
+	transform: translateY(-50%);
 }
 
 .div-footer-button:hover {
@@ -154,7 +149,7 @@
   top    : 0px;
   right  : 0px;
   height : 24px;
-  background-color : #3498db;
+  background-color : #2E79D6;
 }
 
 .div-filter > span {
@@ -176,7 +171,6 @@
   text-indent: -99999px;
   overflow: hidden;
   background-repeat: no-repeat;
-  background-image : url(images/ui-icons_fff_256x240.png);
   width  : 16px;
   height : 16px;
 }
