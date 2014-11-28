@@ -184,6 +184,9 @@ pre {
   color: #f2f2f2;
   text-shadow: none;
   overflow: auto;
+  -moz-tab-size: 2;
+  -o-tab-size:   2;
+  tab-size:      2;
 }
 pre code {
   color: #f2f2f2;

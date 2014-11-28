@@ -9,6 +9,7 @@
 	<link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
 	<link rel="stylesheet" type="text/css" href="https://rawgit.com/TheGr8Nik/divTable/master/dist/css/divTable.min.css" media="screen">
 	<script type="text/javascript" src="https://rawgit.com/TheGr8Nik/divTable/master/dist/js/divTable.min.js" ></script>
+
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
@@ -35,56 +36,122 @@
 			<a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Welcome to divTable presentation page</h3>
 
 			<h3></h3>
-			<p>Base table:</p>
+			<h2>Base table:</h2>
 			<style>
 				#baseTable {
 					width  : 100%;
 					height : 300px;
 				}
 
-				#baseTable .cell-0 {
-					width : 20%;
-				}
-				#baseTable .cell-1 {
-					width : 20%;
-				}
-				#baseTable .cell-2 {
-					width : 20%;
-				}
-				#baseTable .cell-3 {
-					width : 20%;
-				}
+				#baseTable .cell-0,
+				#baseTable .cell-1,
+				#baseTable .cell-2,
+				#baseTable .cell-3,
 				#baseTable .cell-4 {
 					width : 20%;
 				}
 			</style>
 			<div id="baseTable"></div>
+			<h2></h2>
+
+			<div class="code">
+<h4>Javascript:</h4>
+				<pre class="brush: js" >
+baseTable = document.getElementById( 'baseTable' );
+table = divTableMaker( baseTable, {
+	columns : [
+		{ name : 'text',           text : 'Text',            edit : 'text'                                },
+		{ name : 'number',         text : 'Number',          edit : 'number'                              },
+		{ name : 'select',         text : 'Select',          edit : [ '0', '1', '2' ]                     },
+		{ name : 'advancedSelect', text : 'Advanced Select', edit : {1: 'first', 2: 'second', 3: 'third'} },
+		{ name : 'checkbox',       text : 'Checkbox',        edit : 'checkbox'                            }
+	]
+});
+				</pre>
+<h4>CSS:</h4>
+				<pre class="code-css">
+#baseTable {
+	width  : 100%;
+	height : 300px;
+}
+
+#baseTable .cell-0,
+#baseTable .cell-1,
+#baseTable .cell-2,
+#baseTable .cell-3,
+#baseTable .cell-4 {
+	width : 20%;
+}
+				</pre>
+			</div>
 
 			<h3></h3>
-			<p>Advanced edit table:</p>
+			<h2>Advanced edit table:</h2>
+
 			<style>
 				#advTable {
 					width  : 100%;
 					height : 300px;
 				}
 
-				#advTable .cell-0 {
-					width : 20%;
-				}
-				#advTable .cell-1 {
-					width : 20%;
-				}
-				#advTable .cell-2 {
-					width : 20%;
-				}
-				#advTable .cell-3 {
-					width : 20%;
-				}
+				#advTable .cell-0,
+				#advTable .cell-1,
+				#advTable .cell-2,
+				#advTable .cell-3,
 				#advTable .cell-4 {
 					width : 20%;
 				}
 			</style>
 			<div id="advTable"></div>
+			<h2></h2>
+
+			<div class="code">
+<h4>Javascript:</h4>
+				<pre class="code-js" >
+advTable  = document.getElementById( 'advTable'  );
+table = divTableMaker( advTable, {
+	columns : [
+		{ name : 'text',           text : 'Text',            edit : 'text'                                },
+		{ name : 'number',         text : 'Number',          edit : 'number'                              },
+		{ name : 'select',         text : 'Select',          edit : [ '0', '1', '2' ]                     },
+		{ name : 'advancedSelect', text : 'Advanced Select', edit : {1: 'first', 2: 'second', 3: 'third'} },
+		{ name : 'checkbox',       text : 'Checkbox',        edit : 'checkbox'                            }
+	],
+	advancedEdit : {
+		hide   : [],
+		edit   : {},
+		depend : 'select',
+		values : [{
+			value : '0',
+			hide  : [ 'checkbox' ],
+		},{
+			value : '1',
+			hide  : [ 'number', 'text' ],
+			edit  : {
+				'checkbox' : [ '1', '2', '3', '4', '5' ]
+			}
+		}]
+	}
+});
+				</pre>
+<h4>CSS:</h4>
+				<pre class="code-css">
+#advTable {
+	width  : 100%;
+	height : 300px;
+}
+
+#advTable .cell-0,
+#advTable .cell-1,
+#advTable .cell-2,
+#advTable .cell-3,
+#advTable .cell-4 {
+	width : 20%;
+}
+				</pre>
+			</div>
+
+
 			<h3></h3>
 			<h3>
 			<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
@@ -116,67 +183,25 @@
 			advTable  = document.getElementById( 'advTable'  );
 
 		table = divTableMaker( baseTable, {
-			columns : [{
-				name : 'text',
-				text : 'Text',
-				edit : 'text'
-			},{
-				name : 'number',
-				text : 'Number',
-				edit : 'number'
-			},{
-				name : 'select',
-				text : 'Select',
-				edit : [ '0', '1', '2' ]
-			},{
-				name : 'advancedSelect',
-				text : 'Advanced Select',
-				edit : { 1 : 'first', 2 : 'second', 3 : 'third' }
-			},{
-				name : 'checkbox',
-				text : 'Checkbox',
-				edit : 'checkbox'
-			}],
-
-			onFooterClick : function ( name ) {
-		
-				if ( name === 'plus' ) {
-					this.div_table( 'newRow' );
-				}
-				else if ( name === 'trash' ) {
-					this.div_table( 'deleteEditRow' );
-				}
-				else if ( name === 'refresh' ) {
-					this.div_table( 'updateTable' );
-				}
-
-			}
+			columns : [
+				{ name : 'text',           text : 'Text',            edit : 'text'                                },
+				{ name : 'number',         text : 'Number',          edit : 'number'                              },
+				{ name : 'select',         text : 'Select',          edit : [ '0', '1', '2' ]                     },
+				{ name : 'advancedSelect', text : 'Advanced Select', edit : {1: 'first', 2: 'second', 3: 'third'} },
+				{ name : 'checkbox',       text : 'Checkbox',        edit : 'checkbox'                            }
+			]
 		});
 		table.div_table( 'newRow' );
 
 
 		table = divTableMaker( advTable, {
-			columns : [{
-				name : 'text',
-				text : 'Text',
-				edit : 'text'
-			},{
-				name : 'number',
-				text : 'Number',
-				edit : 'number'
-			},{
-				name : 'select',
-				text : 'Select',
-				edit : [ '0', '1', '2' ]
-			},{
-				name : 'advancedSelect',
-				text : 'Advanced Select',
-				edit : { 1 : 'first', 2 : 'second', 3 : 'third' }
-			},{
-				name : 'checkbox',
-				text : 'Checkbox',
-				edit : 'checkbox'
-			}],
+			columns : [
+				{ name : 'text',           text : 'Text',            edit : 'text'                                },
+				{ name : 'number',         text : 'Number',          edit : 'number'                              },
+				{ name : 'select',         text : 'Select',          edit : [ '0', '1', '2' ]                     },
+				{ name : 'advancedSelect', text : 'Advanced Select', edit : {1: 'first', 2: 'second', 3: 'third'} },
+				{ name : 'checkbox',       text : 'Checkbox',        edit : 'checkbox'                            }
+			],
 			advancedEdit : {
 				hide   : [],
 				edit   : {},
@@ -191,20 +216,6 @@
 						'checkbox' : [ '1', '2', '3', '4', '5' ]
 					}
 				}]
-			},
-
-			onFooterClick : function ( name ) {
-		
-				if ( name === 'plus' ) {
-					this.div_table( 'newRow' );
-				}
-				else if ( name === 'trash' ) {
-					this.div_table( 'deleteEditRow' );
-				}
-				else if ( name === 'refresh' ) {
-					this.div_table( 'updateTable' );
-				}
-
 			}
 		});
 		table.div_table( 'newRow' );
