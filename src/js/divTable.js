@@ -41,26 +41,27 @@ var DivTable = function () {
  * INITIALIZATION function
  */
 DivTable.prototype.init = function ( container, options, callback_context ) {
-  var self = this;
-  
-  this.callback_context = callback_context;
-  this.filter = {};
-  
-  this._loadOptions( options );
-  
-  this._buildAdvancedEdit();
-  this._buildRowEditor();
-  
-  this._buildTableStructure( container );
-  this._setDomMap( container );
-  this._addEventHandlers();
-  
-  this._saveMap = {};
-  this.newTable();
-  setTimeout( function () {
-    self._emitCallback( 'onCreate' );
-    self.saveStatus();
-  }, 0 );
+	var self = this;
+	
+	this.callback_context = callback_context;
+	this.filter = {};
+	this.pagination = { page: 1 };
+	
+	this._loadOptions( options );
+	
+	this._buildAdvancedEdit();
+	this._buildRowEditor();
+	
+	this._buildTableStructure( container );
+	this._setDomMap( container );
+	this._addEventHandlers();
+	
+	this._saveMap = {};
+	this.newTable();
+	setTimeout( function () {
+		self._emitCallback( 'onCreate' );
+		self.saveStatus();
+	}, 0 );
 };
 
 /**
@@ -68,85 +69,88 @@ DivTable.prototype.init = function ( container, options, callback_context ) {
  * next it fill the missing options from the default_options object
  */
 DivTable.prototype._loadOptions = function ( config_options ) {
-  var key,
-    options = util.inherit( config_options ),
-    default_options = {
-      class_prefix  : 'div',
-      select_class  : 'select',
-      edit_class    : 'edit',
-      filter_class  : 'filter',
-      hide_class    : 'hide',
-      disable_class : 'disable',
-      
-      columns      : [{
-        name : 'first',
-        text : 'first',
-        edit : 'text'
-      },{
-        name : 'second',
-        text : 'second',
-        edit : [ '0', '1', '2' ]
-      }],
-      footer : [
-        'plus',
-        'trash'
-        //'refresh'
-      ],
-      counter_text : 'Entry {{total}}',
-      
-      order          : 'id',
-      show_filter    : false,
-      auto_edit      : true,
-      disable_footer : false,
-      
-      menu : ''
-        + '<ul id="configMenuUl" styel="width:120px">'
-          + '<li id="menuitem-headerfilter">'
-            + '<a href="#">'
-              + '<span class="ui-icon ui-icon-filter"></span>'
-              + 'Sofort Filter'
-            + '</a>'
-          + '</li>'
-        + '</ul>',
-      
-      advancedEdit : null,
-      
-      onChange      : function ( name, new_val, row ) {},
-      onSelectRow   : function ( row ) {},
-      onFooterClick : function ( name ) {
-        if      ( name === 'plus'    ) { this.bag_table( 'newRow'        ); }
-        else if ( name === 'trash'   ) { this.bag_table( 'deleteEditRow' ); }
-        else if ( name === 'refresh' ) { this.bag_table( 'updateTable'   ); }
-      }
-    };
-  
-  for ( key in default_options ) {
+	var key,
+		options = util.inherit( config_options ),
+		default_options = {
+			class_prefix  : 'div',
+			select_class  : 'select',
+			edit_class    : 'edit',
+			filter_class  : 'filter',
+			hide_class    : 'hide',
+			disable_class : 'disable',
+			
+			columns      : [{
+				name : 'first',
+				text : 'first',
+				edit : 'text'
+			},{
+				name : 'second',
+				text : 'second',
+				edit : [ '0', '1', '2' ]
+			}],
+			footer : [
+				'plus',
+				'trash'
+				//'refresh'
+			],
+			counter_text     : 'Entry {{total}}',
+			pagination_page  : 'Page',
+			pagination_total : 'of',
+			
+			order          : 'id',
+			show_filter    : false,
+			auto_edit      : true,
+			disable_footer : false,
+			pagination     : false,
+			
+			menu : ''
+				+ '<ul id="configMenuUl" styel="width:120px">'
+					+ '<li id="menuitem-headerfilter">'
+						+ '<a href="#">'
+							+ '<span class="ui-icon ui-icon-filter"></span>'
+							+ 'Sofort Filter'
+						+ '</a>'
+					+ '</li>'
+				+ '</ul>',
+			
+			advancedEdit : null,
+			
+			onChange      : function ( name, new_val, row ) {},
+			onSelectRow   : function ( row ) {},
+			onFooterClick : function ( name ) {
+				if      ( name === 'plus'    ) { this.div_table( 'newRow'        ); }
+				else if ( name === 'trash'   ) { this.div_table( 'deleteEditRow' ); }
+				else if ( name === 'refresh' ) { this.div_table( 'updateTable'   ); }
+			}
+		};
+	
+	for ( key in default_options ) {
 		if ( default_options.hasOwnProperty( key ) ) {
 			if ( options[ key ] === undefined ) {
 				options[ key ] = default_options[ key ];
 			}
 		}
-  }
-  
-  this.options = options;
+	}
+	
+	this.options = options;
 };
 
 /**
  * CALL the defined table CALLBACKS
  */
 DivTable.prototype._emitCallback = function ( callback_name, params ) {
-  var args;
-  if ( typeof this.options[ callback_name ] === 'function' ) {
-    switch ( callback_name ) {
-      case 'onCreate'      : args = [];         break;
-      case 'onFooterClick' : args = [ params ]; break;
-      case 'onSelectRow'   : args = [ params ]; break;
-      case 'onChange'      : args = params; break;
-      default : args = []; break;
-    }
-    
-    this.options[ callback_name ].apply( this.callback_context, args );
-  }
+	var args;
+	if ( typeof this.options[ callback_name ] === 'function' ) {
+		switch ( callback_name ) {
+			case 'onCreate'      : args = [];         break;
+			case 'onFooterClick' : args = [ params ]; break;
+			case 'onSelectRow'   : args = [ params ]; break;
+			case 'onChange'      : args = params; break;
+			default : args = []; break;
+		}
+		
+		this.options[ callback_name ].apply( this.callback_context, args );
+	}
 };
 
 
@@ -161,17 +165,17 @@ DivTable.prototype._emitCallback = function ( callback_name, params ) {
  *  return: array of found rows, empty if no row has been found
  */
 DivTable.prototype._getRows = function ( filter ) {
-  var filt;
+	var filt;
 	
-  filt = util.extend( this.filter, { deleted : 'false' } );
+	filt = util.extend( this.filter, { deleted : 'false' } );
 	if ( util.isObject( filter ) ) {
 		filt = util.extend( filt, filter );
-  }
+	}
 	
-  return (
-    this.table( filt )
-      .order( this.options.order || 'id' )
-      .get() );
+	return (
+		this.table( filt )
+			.order( this.options.order || 'id' )
+			.get() );
 };
 
 /**
@@ -181,11 +185,11 @@ DivTable.prototype._getRows = function ( filter ) {
  *  return: the found row or null
  */
 DivTable.prototype._getRowById = function ( id ) {
-  var row = ( this._getRows({ id : id * 1 })[ 0 ] );
-  if ( ! row ) {
-    row = ( this._getRows({ id : ''+ id })[ 0 ] );
-  }
-  return row;
+	var row = ( this._getRows({ id : id * 1 })[ 0 ] );
+	if ( ! row ) {
+		row = ( this._getRows({ id : ''+ id })[ 0 ] );
+	}
+	return row;
 };
 
 /**
@@ -195,25 +199,25 @@ DivTable.prototype._getRowById = function ( id ) {
  *  return: -
  */
 DivTable.prototype._insertRow = function ( row_map ) {
-  var i, len,
-    columns = this.options.columns;
-  
-  row_map.deleted = 'false';
-  row_map.edited  = 'false';
-  row_map.new     = 'true';
-  
-  // rows MUST have an id
-  row_map.id = row_map.id || new Date().getTime();
-  
-  this._checkRowValues( row_map );
+	var i, len,
+		columns = this.options.columns;
+	
+	row_map.deleted = 'false';
+	row_map.edited  = 'false';
+	row_map.new     = 'true';
+	
+	// rows MUST have an id
+	row_map.id = row_map.id || ( ''+ Math.random().toFixed( 15 ) ).slice( -15 );
+	
+	this._checkRowValues( row_map );
 
-  for ( i = 0, len = columns.length; i < len; i++ ) {
-    if ( ! row_map.hasOwnProperty( columns[ i ].name ) ) {
-      row_map[ columns[ i ].name ] = '';
-    }
-  }
-  
-  this.table.insert( row_map );
+	for ( i = 0, len = columns.length; i < len; i++ ) {
+		if ( ! row_map.hasOwnProperty( columns[ i ].name ) ) {
+			row_map[ columns[ i ].name ] = '';
+		}
+	}
+	
+	this.table.insert( row_map );
 };
 
 /**
@@ -225,16 +229,16 @@ DivTable.prototype._insertRow = function ( row_map ) {
  *  return: -
  */
 DivTable.prototype._updateRow = function ( row_id, new_values_map, preventEdited ) {
-  if ( this.table({ id : ''+ row_id }).first() ) {
-    row_id = ''+ row_id;
-  }
-  else {
-    row_id *= 1;
-  }
-  if ( ! preventEdited ) {
-    this.table({ id : row_id, 'new' : 'false', 'edited' : 'false' }).update({ 'edited' : 'true' });
-  }
-  this.table({ id : row_id }).update( new_values_map );
+	if ( this.table({ id : ''+ row_id }).first() ) {
+		row_id = ''+ row_id;
+	}
+	else {
+		row_id *= 1;
+	}
+	if ( ! preventEdited ) {
+		this.table({ id : row_id, 'new' : 'false', 'edited' : 'false' }).update({ 'edited' : 'true' });
+	}
+	this.table({ id : row_id }).update( new_values_map );
 };
 
 /**
@@ -247,21 +251,21 @@ DivTable.prototype._updateRow = function ( row_id, new_values_map, preventEdited
  *  return: -
  */
 DivTable.prototype._deleteRow = function ( row_id, from_db ) {
-  // if the row is not new marks it with deleted
-  if ( this.table({ id : ''+ row_id }).first() ) {
-    row_id = ''+ row_id;
-  }
-  else {
-    row_id *= 1;
-  }
-  
-  if ( ! from_db && this.table({ id : row_id, 'new' : 'false' }).count() ) {
-    this.table({ id : row_id }).update({ deleted : 'true' });
-  }
-  // otherwise remove it
-  else {
-    this.table({ id : row_id }).remove();
-  }
+	// if the row is not new marks it with deleted
+	if ( this.table({ id : ''+ row_id }).first() ) {
+		row_id = ''+ row_id;
+	}
+	else {
+		row_id *= 1;
+	}
+	
+	if ( ! from_db && this.table({ id : row_id, 'new' : 'false' }).count() ) {
+		this.table({ id : row_id }).update({ deleted : 'true' });
+	}
+	// otherwise remove it
+	else {
+		this.table({ id : row_id }).remove();
+	}
 };
 
 
@@ -272,37 +276,37 @@ DivTable.prototype._deleteRow = function ( row_id, from_db ) {
  *  return: -
  */
 DivTable.prototype._checkRowValues = function ( row_map ) {
-  var edit, hide, i, len, column, first;
-  
-  edit = this.edit.getEdit ( row_map );
-  
-  for ( column in edit ) {
-    if ( edit.hasOwnProperty( column ) ) {
-      if ( util.isObject( edit[ column ] ) ) {
-        if ( ! edit[ column ].hasOwnProperty( row_map[ column ] ) ) {
-          // value of the column not allowed
-          for ( first in edit[ column ] ) {
+	var edit, hide, i, len, column, first;
+	
+	edit = this.edit.getEdit ( row_map );
+	
+	for ( column in edit ) {
+		if ( edit.hasOwnProperty( column ) ) {
+			if ( util.isObject( edit[ column ] ) ) {
+				if ( ! edit[ column ].hasOwnProperty( row_map[ column ] ) ) {
+					// value of the column not allowed
+					for ( first in edit[ column ] ) {
 						if ( column.hasOwnProperty( first ) ) {
 							break;
 						}
 					}
-          row_map[ column ] = first;
-        }
-      }
-      else if ( util.isArray( edit[ column ] ) ) {
-        if ( ! util.inArray( row_map[ column ], edit[ column ] ) ) {
-          row_map[ column ] = edit[ column ][ 0 ];
-        }
-      }
-    }
-  }
-  
-  hide = this.edit.getHidden( row_map );
-  
-  for ( i = 0, len = hide.length; i < len; i++ ) {
-    row_map[ hide[ i ] ] = null;
-  }
-  
+					row_map[ column ] = first;
+				}
+			}
+			else if ( util.isArray( edit[ column ] ) ) {
+				if ( ! util.inArray( row_map[ column ], edit[ column ] ) ) {
+					row_map[ column ] = edit[ column ][ 0 ];
+				}
+			}
+		}
+	}
+	
+	hide = this.edit.getHidden( row_map );
+	
+	for ( i = 0, len = hide.length; i < len; i++ ) {
+		row_map[ hide[ i ] ] = null;
+	}
+	
 };
 
 /**
@@ -323,48 +327,48 @@ DivTable.prototype._checkRowValues = function ( row_map ) {
  *  return: unique values
  */
 DivTable.prototype._getUniqueValues = function ( row_values, name, edit, filter ) {
-  var rows, selected, i, j, len,
-    obj = {},
-    uniqueObj  = util.clone( edit );
-  
-  if ( ! row_values ) {
-    return uniqueObj;
-  }
-  
-  if ( filter ) {
-    obj[ filter ] = { 'isnocase' : row_values[ filter ] };
-  }
-  rows = this._getRows( obj );
-  
-  selected = util.getArrayByKey( rows, name );
-  
-  if ( util.isArray( uniqueObj ) ) {
-    array_outer:
-    for ( i = 0, len = selected.length; i < len; ++i ) {
-      if ( selected[ i ] === row_values[ name ] ) {
-        continue array_outer;
-      }
-      for ( j = uniqueObj.length; j--; ) {
-        if ( selected[ i ] === uniqueObj[ j ] ) {
-          uniqueObj.splice( j, 1 );
-          continue array_outer;
-        }
-      }
-    }
-  }
-  else if ( util.isObject( uniqueObj ) ) {
-    obj_outer:
-    for ( i = 0, len = selected.length; i < len; ++i ) {
-      if ( selected[ i ] === row_values[ name ] ) {
-        continue obj_outer;
-      }
-      if ( uniqueObj.hasOwnProperty( selected[ i ] ) ) {
-        delete uniqueObj[ selected[ i ] ];
-      }
-    }
-  }
-  
-  return uniqueObj;
+	var rows, selected, i, j, len,
+		obj = {},
+		uniqueObj  = util.clone( edit );
+	
+	if ( ! row_values ) {
+		return uniqueObj;
+	}
+	
+	if ( filter ) {
+		obj[ filter ] = { 'isnocase' : row_values[ filter ] };
+	}
+	rows = this._getRows( obj );
+	
+	selected = util.getArrayByKey( rows, name );
+	
+	if ( util.isArray( uniqueObj ) ) {
+		array_outer:
+		for ( i = 0, len = selected.length; i < len; ++i ) {
+			if ( selected[ i ] === row_values[ name ] ) {
+				continue array_outer;
+			}
+			for ( j = uniqueObj.length; j--; ) {
+				if ( selected[ i ] === uniqueObj[ j ] ) {
+					uniqueObj.splice( j, 1 );
+					continue array_outer;
+				}
+			}
+		}
+	}
+	else if ( util.isObject( uniqueObj ) ) {
+		obj_outer:
+		for ( i = 0, len = selected.length; i < len; ++i ) {
+			if ( selected[ i ] === row_values[ name ] ) {
+				continue obj_outer;
+			}
+			if ( uniqueObj.hasOwnProperty( selected[ i ] ) ) {
+				delete uniqueObj[ selected[ i ] ];
+			}
+		}
+	}
+	
+	return uniqueObj;
 };
 
 
@@ -377,161 +381,161 @@ DivTable.prototype._getUniqueValues = function ( row_values, name, edit, filter 
  * row value, to find the hidden cell and the actual edit method
  */
 DivTable.prototype._buildAdvancedEdit = function () {
-  var
-    EditCondition, edit,
-    self   = this,
-    struct = this.options.advancedEdit,
-    addEditCondition = function ( condition, parent ) {
-      var
-        i, len,
-        new_condition = new EditCondition(
-          condition.edit,
-          condition.hide,
-          condition.depend
-        );
-      
-      if ( condition.values ) {
-        for ( i = 0, len = condition.values.length; i < len; ++i ) {
-          addEditCondition( condition.values[ i ], new_condition );
-        }
-      }
-      
-      if ( parent ) {
-        parent.addChild( condition.value, condition.invert || false, new_condition );
-        return parent;
-      }
-      else {
-        return new_condition;
-      }
-    };
-  
-  EditCondition = function ( edit, hide, depend ) {
-    this.edit     = edit || {};
-    this.hide     = hide || [];
-    this.depend   = depend;
-    this.children = [];
-  };
-  
-  EditCondition.prototype = {
-    getEdit : function ( value_map ) {
-      if ( this.depend ) {
-        var child = this.getChild( value_map );
-        
-        if ( ! child ) {
-          return util.clone( this.edit );
-        }
-        
-        return util.extend( this.edit, child.getEdit( value_map ) );
-      }
-      else {
-        return util.clone( this.edit );
-      }
-    },
-    
-    getHidden : function ( value_map ) {
-      if ( this.depend ) {
-        var child = this.getChild( value_map );
-        
-        if ( ! child ) {
-          return this.hide;
-        }
-        return this.hide.concat( child.getHidden( value_map ) );
-      }
-      else {
-        return this.hide;
-      }
-    },
-    
-    getDepend : function () {
-      var i, len,
-        depends = ( this.depend ) ? [ this.depend ] : [];
-      
-      if ( this.children.length ) {
-        for ( i = 0, len = this.children.length; i < len; ++i ) {
-          depends = depends.concat( this.children[ i ].child.getDepend() );
-        }
-      }
-      
-      return depends;
-    },
-    
-    addChild : function ( value, invert, child ) {
-      this.children.push({
-        value  : value,
-        invert : invert,
-        child  : child
-      });
-    },
-    
-    getChild : function ( value_map ) {
-      var
-        i, len, child,
-        depend = this.depend,
-        value  = value_map[ depend ];
-        
-      for ( i = 0, len = this.children.length; i < len; ++i ) {
-        child = this.children[ i ];
-        if ( ! ( child.invert ) 
-             != 
-             ! ( child.value === value || util.inArray( value, child.value ) ) ) {
-          return child.child;
-        }
-      }
-    }
-  };
-  
-  edit = addEditCondition( struct || {} );
-  
-  // extend advanced get edit with the normal
-  var ExtendEdit = function ( edit ) {
-    this.edit = edit;
-  };
-  
-  ExtendEdit.prototype = {
-    getEdit : function () {
-      var i, len, name, hidden,
-        row_values = arguments[ 0 ],
-        all        = arguments[ 1 ] || false,
-        columns = self.options.columns,
-        edit    = this.edit.getEdit.apply( this.edit, arguments );
-      
-      for ( i = 0, len = columns.length; i < len; i++ ) {
-        name = columns[ i ].name;
-        
-        if ( ! edit[ name ] ) {
-          edit[ name ] = columns[ i ].edit;
-        }
-        
-        if ( ! all && columns[ i ].unique ) {
-          edit[ name ] = self._getUniqueValues( row_values, name, edit[ name ] );
-        }
-        
-        if ( typeof edit[ name ] === 'function' ) {
-          edit[ name ] = edit[ name ]( row_values );
-        }
-      }
-      
-      hidden = this.getHidden.apply( this, arguments );
-      
-      for ( i = 0, len = hidden.length; i < len; i++ ) {
-        if ( edit[ hidden[ i ] ] ) {
-          edit[ hidden[ i ] ] = 'hidden';
-        }
-      }
-      
-      return edit;
-    },
-    
-    getHidden : function () {
-      return this.edit.getHidden.apply( this.edit, arguments );
-    },
-    
-    getDepend : function () {
-      return this.edit.getDepend.apply( this.edit, arguments );
-    }
-  };
-  
-  this.edit = new ExtendEdit( edit );
+	var
+		EditCondition, edit,
+		self   = this,
+		struct = this.options.advancedEdit,
+		addEditCondition = function ( condition, parent ) {
+			var
+				i, len,
+				new_condition = new EditCondition(
+					condition.edit,
+					condition.hide,
+					condition.depend
+				);
+			
+			if ( condition.values ) {
+				for ( i = 0, len = condition.values.length; i < len; ++i ) {
+					addEditCondition( condition.values[ i ], new_condition );
+				}
+			}
+			
+			if ( parent ) {
+				parent.addChild( condition.value, condition.invert || false, new_condition );
+				return parent;
+			}
+			else {
+				return new_condition;
+			}
+		};
+	
+	EditCondition = function ( edit, hide, depend ) {
+		this.edit     = edit || {};
+		this.hide     = hide || [];
+		this.depend   = depend;
+		this.children = [];
+	};
+	
+	EditCondition.prototype = {
+		getEdit : function ( value_map ) {
+			if ( this.depend ) {
+				var child = this.getChild( value_map );
+				
+				if ( ! child ) {
+					return util.clone( this.edit );
+				}
+				
+				return util.extend( this.edit, child.getEdit( value_map ) );
+			}
+			else {
+				return util.clone( this.edit );
+			}
+		},
+		
+		getHidden : function ( value_map ) {
+			if ( this.depend ) {
+				var child = this.getChild( value_map );
+				
+				if ( ! child ) {
+					return this.hide;
+				}
+				return this.hide.concat( child.getHidden( value_map ) );
+			}
+			else {
+				return this.hide;
+			}
+		},
+		
+		getDepend : function () {
+			var i, len,
+				depends = ( this.depend ) ? [ this.depend ] : [];
+			
+			if ( this.children.length ) {
+				for ( i = 0, len = this.children.length; i < len; ++i ) {
+					depends = depends.concat( this.children[ i ].child.getDepend() );
+				}
+			}
+			
+			return depends;
+		},
+		
+		addChild : function ( value, invert, child ) {
+			this.children.push({
+				value  : value,
+				invert : invert,
+				child  : child
+			});
+		},
+		
+		getChild : function ( value_map ) {
+			var
+				i, len, child,
+				depend = this.depend,
+				value  = value_map[ depend ];
+				
+			for ( i = 0, len = this.children.length; i < len; ++i ) {
+				child = this.children[ i ];
+				if ( ! ( child.invert ) 
+						 != 
+						 ! ( child.value === value || util.inArray( value, child.value ) ) ) {
+					return child.child;
+				}
+			}
+		}
+	};
+	
+	edit = addEditCondition( struct || {} );
+	
+	// extend advanced get edit with the normal
+	var ExtendEdit = function ( edit ) {
+		this.edit = edit;
+	};
+	
+	ExtendEdit.prototype = {
+		getEdit : function () {
+			var i, len, name, hidden,
+				row_values = arguments[ 0 ],
+				all        = arguments[ 1 ] || false,
+				columns = self.options.columns,
+				edit    = this.edit.getEdit.apply( this.edit, arguments );
+			
+			for ( i = 0, len = columns.length; i < len; i++ ) {
+				name = columns[ i ].name;
+				
+				if ( ! edit[ name ] ) {
+					edit[ name ] = columns[ i ].edit;
+				}
+				
+				if ( ! all && columns[ i ].unique ) {
+					edit[ name ] = self._getUniqueValues( row_values, name, edit[ name ] );
+				}
+				
+				if ( typeof edit[ name ] === 'function' ) {
+					edit[ name ] = edit[ name ]( row_values );
+				}
+			}
+			
+			hidden = this.getHidden.apply( this, arguments );
+			
+			for ( i = 0, len = hidden.length; i < len; i++ ) {
+				if ( edit[ hidden[ i ] ] ) {
+					edit[ hidden[ i ] ] = 'hidden';
+				}
+			}
+			
+			return edit;
+		},
+		
+		getHidden : function () {
+			return this.edit.getHidden.apply( this.edit, arguments );
+		},
+		
+		getDepend : function () {
+			return this.edit.getDepend.apply( this.edit, arguments );
+		}
+	};
+	
+	this.edit = new ExtendEdit( edit );
 };
 
 /**
@@ -540,244 +544,244 @@ DivTable.prototype._buildAdvancedEdit = function () {
  *  return: -
  */
 DivTable.prototype._buildRowEditor = function () {
-  var Observable,
-    BaseEditor,   TextEditor,           NumberEditor,
-    SelectEditor, AdvancedSelectEditor, DateEditor,
-    TimeEditor,   CheckboxEditor,       HiddenEditor,
-    self    = this;
-    //columns = this.options.columns;
-  
-  /**
-   *  Observable object
-   *  it can subscribe functions and
-   *  emit events to the subscribed functions
-   */
-  Observable = function () {
-    this.subscribed = {};
-  };
+	var Observable,
+		BaseEditor,   TextEditor,           NumberEditor,
+		SelectEditor, AdvancedSelectEditor, DateEditor,
+		TimeEditor,   CheckboxEditor,       HiddenEditor,
+		self    = this;
+		//columns = this.options.columns;
+	
+	/**
+	 *  Observable object
+	 *  it can subscribe functions and
+	 *  emit events to the subscribed functions
+	 */
+	Observable = function () {
+		this.subscribed = {};
+	};
 
-  Observable.prototype = {
-    subscribe : function ( event_name, fn, context ) {
-      var id = new Date().getTime();
-      
-      if ( ! this.subscribed.hasOwnProperty( event_name ) ) {
-        this.subscribed[ event_name ] = {};
-      }
-      
-      this.subscribed[ event_name ][ id ] = {
-        fn  : fn,
-        ctx : context || this
-      };
-      return id;
-    },
-    
-    emit : function ( event_name, arg_map ) {
-      var id, current;
-      
-      if ( this.subscribed.hasOwnProperty( event_name ) ) {
-        for ( id in this.subscribed[ event_name ] ) {
-          if ( this.subscribed[ event_name ].hasOwnProperty( id ) ) {
-            current = this.subscribed[ event_name ][ id ];
-            current.fn.call( current.ctx, arg_map );
-          }
-        }
-      }
-    }
-  };
+	Observable.prototype = {
+		subscribe : function ( event_name, fn, context ) {
+			var id = new Date().getTime();
+			
+			if ( ! this.subscribed.hasOwnProperty( event_name ) ) {
+				this.subscribed[ event_name ] = {};
+			}
+			
+			this.subscribed[ event_name ][ id ] = {
+				fn  : fn,
+				ctx : context || this
+			};
+			return id;
+		},
+		
+		emit : function ( event_name, arg_map ) {
+			var id, current;
+			
+			if ( this.subscribed.hasOwnProperty( event_name ) ) {
+				for ( id in this.subscribed[ event_name ] ) {
+					if ( this.subscribed[ event_name ].hasOwnProperty( id ) ) {
+						current = this.subscribed[ event_name ][ id ];
+						current.fn.call( current.ctx, arg_map );
+					}
+				}
+			}
+		}
+	};
 
-  
-  //------------------------------------------------------------
-  // Definition of the EDITORS
-  //
-  BaseEditor = function ( column_name, row ) {
-    Observable.call( this );
-    var cell_selector = '[name="'+ column_name +'"]';
-    
-    this.editor        = null;
-    this.column_name   = column_name;
-    this.editor_class  = self.options.class_prefix +'-'+ self.options.edit_class;
-    
-    this.row    = row;
-    this.cell   = ( row ) ? row.querySelector( cell_selector ) : null;
-    this.editor = null;
-  };
-  
-  BaseEditor.prototype = new Observable();
-  BaseEditor.prototype.constructor = BaseEditor;
-  
-  BaseEditor.prototype.getValue = function () {
-    var id = this.row.id;
-    return self._getRowById( id )[ this.column_name ];
-  };
-  
-  BaseEditor.prototype.setValue = function ( new_value, prevent_emit ) {
-    var 
-      id = this.row.id,
-      new_value_map = {};
-    
-    new_value_map[ this.column_name ] = new_value;
-    
-    self._updateRow( id, new_value_map );
-    
-    if ( ! prevent_emit ) {
-      this.emit( 'change', {
-        column : this.column_name, 
-        value  : new_value
-      });
-    }
-  };
-  
-  BaseEditor.prototype.destroy  = function () {
-    if ( this.editor && this.editor.parentNode ) {
-      this.editor.parentNode.removeChild( this.editor );
-    }
-  };
+	
+	//------------------------------------------------------------
+	// Definition of the EDITORS
+	//
+	BaseEditor = function ( column_name, row ) {
+		Observable.call( this );
+		var cell_selector = '[name="'+ column_name +'"]';
+		
+		this.editor        = null;
+		this.column_name   = column_name;
+		this.editor_class  = self.options.class_prefix +'-'+ self.options.edit_class;
+		
+		this.row    = row;
+		this.cell   = ( row ) ? row.querySelector( cell_selector ) : null;
+		this.editor = null;
+	};
+	
+	BaseEditor.prototype = new Observable();
+	BaseEditor.prototype.constructor = BaseEditor;
+	
+	BaseEditor.prototype.getValue = function () {
+		var id = this.row.id;
+		return self._getRowById( id )[ this.column_name ];
+	};
+	
+	BaseEditor.prototype.setValue = function ( new_value, prevent_emit ) {
+		var 
+			id = this.row.id,
+			new_value_map = {};
+		
+		new_value_map[ this.column_name ] = new_value;
+		
+		self._updateRow( id, new_value_map );
+		
+		if ( ! prevent_emit ) {
+			this.emit( 'change', {
+				column : this.column_name, 
+				value  : new_value
+			});
+		}
+	};
+	
+	BaseEditor.prototype.destroy  = function () {
+		if ( this.editor && this.editor.parentNode ) {
+			this.editor.parentNode.removeChild( this.editor );
+		}
+	};
 
-  BaseEditor.prototype.init = function () {
-    // To be overridden form subclasses
-  };
-  
-  BaseEditor.prototype.update = function ( new_value ) {
-    // To be overridden form subclasses
-    if ( this.cell ) {
-      this.cell.innerHTML = new_value;
-    }
-    this.setValue( new_value, true );
-  };
-  
-  /**
-   * Text editor
-   */
-  TextEditor = function ( column_name, row ) {
-    BaseEditor.call( this, column_name, row );
-  };
-  
-  TextEditor.prototype = new BaseEditor();
-  TextEditor.prototype.constructor = TextEditor;
-  
-  TextEditor.prototype.init = function () {
-    var
-      self  = this,
-      text  = this.getValue() || '',
-      input = document.createElement( 'input' );
-    
-    input.className = this.editor_class;
-    input.setAttribute( 'type', 'text' );
-    input.value     = text;
-    this.cell.insertBefore( input, this.cell.firstChild );
-    
-    this.editor = input;
-    
-    util.addEvent( input, 'keyup', function () {
-      self.setValue( this.value );
-    });
-  };
-  
-  /**
-   * Number Editor
-   */
-  NumberEditor = function ( column_name, row ) {
-    BaseEditor.call( this, column_name, row );
-  };
-  
-  NumberEditor.prototype = new BaseEditor();
-  NumberEditor.prototype.constructor = NumberEditor;
-  
-  NumberEditor.prototype.init = function () {
-    var
-      self   = this,
-      number = this.getValue() || 0,
-      input  = document.createElement( 'input' );
-    
-    input.className = this.editor_class;
-    input.setAttribute( 'type', 'number' );
-    input.value     = number;
-    this.cell.insertBefore( input, this.cell.firstChild );
-    
-    this.editor = input;
-    
-    util.addEvent( input, 'keyup', function () {
-      self.setValue( this.value );
-    });
-  };
-  
-  /**
-   * Select Editor
-   */
-  SelectEditor = function ( column_name, row ) {
-    BaseEditor.call( this, column_name, row );
-  };
-  
-  SelectEditor.prototype = new BaseEditor();
-  SelectEditor.prototype.constructor = SelectEditor;
-  
-  SelectEditor.prototype.init = function ( arg_map ) {
-    var i, len, value, selected,
-      self   = this,
-      values        = arg_map.values || [],
-      initial_value = this.getValue(),
-      select  = document.createElement( 'select' ),
-      options = [],
-      initial = false;
-    
-    select.className = this.editor_class;
-    
-    for ( i = 0, len = values.length; i < len; ++i ) {
-      value = values[ i ];
-      if ( value == initial_value ) {
-        selected = 'selected="selected"';
-        initial  = true;
-      }
-      else {
-        selected = '';
-      }
-      options.push( ''
-        + '<option '
-          + 'value="'+ value +'" '
-          + selected +' '
-          + 'name="'+ i +'">'
-            + value
-        + '</option>'
-      );
-    }
-    
-    util.addEvent( select, 'change', function () {
-      self.setValue( this.value );
-    });
-    
-    select.innerHTML = options.join( '' );
-    
-    if ( ! initial ) {
-      this.setValue( select.value );
-    }
-    
-    this.cell.insertBefore( select, this.cell.firstChild );
-    
-    this.editor = select;
-  };
-  
-  /**
-   * Advanced Select Editor
-   */
-  AdvancedSelectEditor = function ( column_name, row ) {
-    BaseEditor.call( this, column_name, row );
-  };
-  
-  AdvancedSelectEditor.prototype = new BaseEditor();
-  AdvancedSelectEditor.prototype.constructor = AdvancedSelectEditor;
-  
-  AdvancedSelectEditor.prototype.init = function ( arg_map ) {
-    var value, selected, 
-      self   = this,
-      values        = arg_map.values || [],
-      initial_value = this.getValue(),
-      select  = document.createElement( 'select' ),
-      options = [],
-      initial = false;
-    
-    select.className = this.editor_class;
-    
-    for ( value in values ) {
+	BaseEditor.prototype.init = function () {
+		// To be overridden form subclasses
+	};
+	
+	BaseEditor.prototype.update = function ( new_value ) {
+		// To be overridden form subclasses
+		if ( this.cell ) {
+			this.cell.innerHTML = new_value;
+		}
+		this.setValue( new_value, true );
+	};
+	
+	/**
+	 * Text editor
+	 */
+	TextEditor = function ( column_name, row ) {
+		BaseEditor.call( this, column_name, row );
+	};
+	
+	TextEditor.prototype = new BaseEditor();
+	TextEditor.prototype.constructor = TextEditor;
+	
+	TextEditor.prototype.init = function () {
+		var
+			self  = this,
+			text  = this.getValue() || '',
+			input = document.createElement( 'input' );
+		
+		input.className = this.editor_class;
+		input.setAttribute( 'type', 'text' );
+		input.value     = text;
+		this.cell.insertBefore( input, this.cell.firstChild );
+		
+		this.editor = input;
+		
+		util.addEvent( input, 'keyup', function () {
+			self.setValue( this.value );
+		});
+	};
+	
+	/**
+	 * Number Editor
+	 */
+	NumberEditor = function ( column_name, row ) {
+		BaseEditor.call( this, column_name, row );
+	};
+	
+	NumberEditor.prototype = new BaseEditor();
+	NumberEditor.prototype.constructor = NumberEditor;
+	
+	NumberEditor.prototype.init = function () {
+		var
+			self   = this,
+			number = this.getValue() || 0,
+			input  = document.createElement( 'input' );
+		
+		input.className = this.editor_class;
+		input.setAttribute( 'type', 'number' );
+		input.value     = number;
+		this.cell.insertBefore( input, this.cell.firstChild );
+		
+		this.editor = input;
+		
+		util.addEvent( input, 'keyup', function () {
+			self.setValue( this.value );
+		});
+	};
+	
+	/**
+	 * Select Editor
+	 */
+	SelectEditor = function ( column_name, row ) {
+		BaseEditor.call( this, column_name, row );
+	};
+	
+	SelectEditor.prototype = new BaseEditor();
+	SelectEditor.prototype.constructor = SelectEditor;
+	
+	SelectEditor.prototype.init = function ( arg_map ) {
+		var i, len, value, selected,
+			self   = this,
+			values        = arg_map.values || [],
+			initial_value = this.getValue(),
+			select  = document.createElement( 'select' ),
+			options = [],
+			initial = false;
+		
+		select.className = this.editor_class;
+		
+		for ( i = 0, len = values.length; i < len; ++i ) {
+			value = values[ i ];
+			if ( value == initial_value ) {
+				selected = 'selected="selected"';
+				initial  = true;
+			}
+			else {
+				selected = '';
+			}
+			options.push( ''
+				+ '<option '
+					+ 'value="'+ value +'" '
+					+ selected +' '
+					+ 'name="'+ i +'">'
+						+ value
+				+ '</option>'
+			);
+		}
+		
+		util.addEvent( select, 'change', function () {
+			self.setValue( this.value );
+		});
+		
+		select.innerHTML = options.join( '' );
+		
+		if ( ! initial ) {
+			this.setValue( select.value );
+		}
+		
+		this.cell.insertBefore( select, this.cell.firstChild );
+		
+		this.editor = select;
+	};
+	
+	/**
+	 * Advanced Select Editor
+	 */
+	AdvancedSelectEditor = function ( column_name, row ) {
+		BaseEditor.call( this, column_name, row );
+	};
+	
+	AdvancedSelectEditor.prototype = new BaseEditor();
+	AdvancedSelectEditor.prototype.constructor = AdvancedSelectEditor;
+	
+	AdvancedSelectEditor.prototype.init = function ( arg_map ) {
+		var value, selected, 
+			self   = this,
+			values        = arg_map.values || [],
+			initial_value = this.getValue(),
+			select  = document.createElement( 'select' ),
+			options = [],
+			initial = false;
+		
+		select.className = this.editor_class;
+		
+		for ( value in values ) {
 			if ( values.hasOwnProperty( value ) ) {
 				if ( value == initial_value ) {
 					selected = 'selected="selected"';
@@ -794,262 +798,262 @@ DivTable.prototype._buildRowEditor = function () {
 					+ '</option>'
 				);
 			}
-    }
-    
-    util.addEvent( select, 'change', function () {
-      self.setValue( this.value );
-    });
-    
-    select.innerHTML = options.join( '' );
-    
-    if ( ! initial ) {
-      this.setValue( select.value );
-    }
-    
-    this.cell.insertBefore( select, this.cell.firstChild );
-    
-    this.editor = select;
-  };
-  
-  AdvancedSelectEditor.prototype.update = function ( new_value ) {
-    var i, len,
-      options = this.editor.childNodes;
-    
-    for ( i = 0, len = options.length; i < len; i++ ) {
-      if ( options[ i ].value === new_value ) {
-        this.editor.selectedIndex = i;
-        break;
-      }
-    }
-    
-    this.setValue( new_value, true );
-  };
-  
-  /**
-   * Date editor
-   */
-  DateEditor = function ( column_name, row ) {
-    BaseEditor.call( this, column_name, row );
-  };
-  
-  DateEditor.prototype = new BaseEditor();
-  DateEditor.prototype.constructor = DateEditor;
-  
-  DateEditor.prototype.init = function () {
-    var
-      self  = this,
-      text  = this.getValue() || '',
-      input = document.createElement( 'input' );
-    
-    input.className = this.editor_class;
-    input.value     = text;
-    this.cell.insertBefore( input, this.cell.firstChild );
-    
-    this.editor = input;
-    
-    $( input ).datetimepicker({
-        showTimepicker : false,
-        onSelect : function () {
-          self.setValue( this.value );
-        }
-      });
-  };
-  
-  DateEditor.prototype.destroy = function () {
-    $( this.editor ).datetimepicker( 'destroy' );
-    BaseEditor.prototype.destroy.apply( this, arguments );
-  };
-  
-  /**
-   * Time editor
-   */
-  TimeEditor = function ( column_name, row ) {
-    BaseEditor.call( this, column_name, row );
-  };
-  
-  TimeEditor.prototype = new BaseEditor();
-  TimeEditor.prototype.constructor = TimeEditor;
-  
-  TimeEditor.prototype.init = function () {
-    var timePicker,
-      self  = this,
-      text  = this.getValue() || '04:00',
-      input = document.createElement( 'input' );
-    
-    input.className = this.editor_class;
-    input.value     = text;
-    this.cell.insertBefore( input, this.cell.firstChild );
-    
-    this.editor = input;
-    
-    timePicker = new TimePicker({
-      target : input,
-      h_min  : 4,
-      h_max  : 27
-    });
-    
-    timePicker.subscribe( 'change', function ( new_val ) {
-      self.setValue( new_val );
-    });
-    
-    this.timePicker = timePicker;
-  };
-  
-  TimeEditor.prototype.destroy = function () {
-    if ( this.timePicker ) {
-      this.timePicker.destroy();
-    }
-    BaseEditor.prototype.destroy.apply( this, arguments );
-  };
-  
-  /**
-   * Check-box editor
-   */
-  CheckboxEditor = function ( column_name, row ) {
-    BaseEditor.call( this, column_name, row );
-  };
-  
-  CheckboxEditor.prototype = new BaseEditor();
-  CheckboxEditor.prototype.constructor = CheckboxEditor;
-  
-  CheckboxEditor.prototype.init = function () {
-    var
-      self  = this,
-      checked  = this.getValue() || false,
-      input = document.createElement( 'input' );
-    
-    input.className = this.editor_class;
-    input.setAttribute( 'type', 'checkbox' );
-    input.checked = checked;
-    this.cell.insertBefore( input, this.cell.firstChild );
-    
-    this.editor = input;
-    
-    util.addEvent( input, 'change', function () {
-      self.setValue( this.checked );
-    });
-  };
-  
-  HiddenEditor = function ( column_name, row ) {
-    BaseEditor.call( this, column_name, row );
-  };
-  
-  HiddenEditor.prototype = new BaseEditor();
-  HiddenEditor.prototype.constructor = HiddenEditor;
-  
-  HiddenEditor.prototype.init = function () {
-    var
-      hidden = document.createElement( 'div' );
-    
-    hidden.className = this.editor_class +'-hidden';
-    this.cell.insertBefore( hidden, this.cell.firstChild );
-    
-    this.editor = hidden;
-  };
-  
-  /**
-   * Row Editor manager
-   */
-  var Editor = function () {
-    this.editingId  = null;
-    this.editingMap = {};
-    this.onChange   = null;
-  };
-  
-  Editor.prototype.getEditorType = function ( edit_type ) {
-    var editor_type, constructor;
-    
-    if ( edit_type === 'text' ) {
-      editor_type = 'text';
-      constructor = TextEditor;
-    }
-    else if ( edit_type === 'number' ) {
-      editor_type = 'number';
-      constructor = NumberEditor;
-    }
-    else if ( util.isArray( edit_type ) ) {
-      editor_type = 'select';
-      constructor = SelectEditor;
-    }
-    else if ( util.isObject( edit_type ) ) {
-      editor_type = 'advancedSelect';
-      constructor = AdvancedSelectEditor;
-    }
-    else if ( edit_type === 'date' ) {
-      editor_type = 'date';
-      constructor = DateEditor;
-    }
-    else if ( edit_type === 'time' ) {
-      editor_type = 'time';
-      constructor = TimeEditor;
-    }
-    else if ( edit_type === 'checkbox' ) {
-      editor_type = 'checkbox';
-      constructor = CheckboxEditor;
-    }
-    else if ( edit_type === 'hidden' ) {
-      editor_type = 'hidden';
-      constructor = HiddenEditor;
-    }
-    else {
-      editor_type = 'none';
-      constructor = BaseEditor;
-    }
-    
-    return {
-      type        : editor_type,
-      Constructor : constructor
-    };
-  };
-  
-  Editor.prototype._editCell = function ( column, edit_type ) {
-    var cell_editor,
-      editor      = this.getEditorType( edit_type ),
-      editor_type = editor.type;
-    
-    cell_editor = new editor.Constructor( column, this.row );
-    cell_editor.init({
-      values : edit_type
-    });
-    
-    this.addChangeHandler( cell_editor );
-    
-    this.editingMap[ column ] = {
-      type   : editor_type,
-      editor : cell_editor
-    };
-  };
-  
-  Editor.prototype.start = function ( row, edit_map ) {
-    var column;
-    
-    // prevent double editing row
-    if ( this.editingId === row.id ) {
-      return;
-    }
-    if ( this.editingId ) {
-      this.end();
-    }
-    this.row       = row;
-    this.editingId = row.id;
-    
-    this.editingMap = {};
-    
-    for ( column in edit_map ) {
+		}
+		
+		util.addEvent( select, 'change', function () {
+			self.setValue( this.value );
+		});
+		
+		select.innerHTML = options.join( '' );
+		
+		if ( ! initial ) {
+			this.setValue( select.value );
+		}
+		
+		this.cell.insertBefore( select, this.cell.firstChild );
+		
+		this.editor = select;
+	};
+	
+	AdvancedSelectEditor.prototype.update = function ( new_value ) {
+		var i, len,
+			options = this.editor.childNodes;
+		
+		for ( i = 0, len = options.length; i < len; i++ ) {
+			if ( options[ i ].value === new_value ) {
+				this.editor.selectedIndex = i;
+				break;
+			}
+		}
+		
+		this.setValue( new_value, true );
+	};
+	
+	/**
+	 * Date editor
+	 */
+	DateEditor = function ( column_name, row ) {
+		BaseEditor.call( this, column_name, row );
+	};
+	
+	DateEditor.prototype = new BaseEditor();
+	DateEditor.prototype.constructor = DateEditor;
+	
+	DateEditor.prototype.init = function () {
+		var
+			self  = this,
+			text  = this.getValue() || '',
+			input = document.createElement( 'input' );
+		
+		input.className = this.editor_class;
+		input.value     = text;
+		this.cell.insertBefore( input, this.cell.firstChild );
+		
+		this.editor = input;
+		
+		$( input ).datetimepicker({
+				showTimepicker : false,
+				onSelect : function () {
+					self.setValue( this.value );
+				}
+			});
+	};
+	
+	DateEditor.prototype.destroy = function () {
+		$( this.editor ).datetimepicker( 'destroy' );
+		BaseEditor.prototype.destroy.apply( this, arguments );
+	};
+	
+	/**
+	 * Time editor
+	 */
+	TimeEditor = function ( column_name, row ) {
+		BaseEditor.call( this, column_name, row );
+	};
+	
+	TimeEditor.prototype = new BaseEditor();
+	TimeEditor.prototype.constructor = TimeEditor;
+	
+	TimeEditor.prototype.init = function () {
+		var timePicker,
+			self  = this,
+			text  = this.getValue() || '04:00',
+			input = document.createElement( 'input' );
+		
+		input.className = this.editor_class;
+		input.value     = text;
+		this.cell.insertBefore( input, this.cell.firstChild );
+		
+		this.editor = input;
+		
+		timePicker = new TimePicker({
+			target : input,
+			h_min  : 4,
+			h_max  : 27
+		});
+		
+		timePicker.subscribe( 'change', function ( new_val ) {
+			self.setValue( new_val );
+		});
+		
+		this.timePicker = timePicker;
+	};
+	
+	TimeEditor.prototype.destroy = function () {
+		if ( this.timePicker ) {
+			this.timePicker.destroy();
+		}
+		BaseEditor.prototype.destroy.apply( this, arguments );
+	};
+	
+	/**
+	 * Check-box editor
+	 */
+	CheckboxEditor = function ( column_name, row ) {
+		BaseEditor.call( this, column_name, row );
+	};
+	
+	CheckboxEditor.prototype = new BaseEditor();
+	CheckboxEditor.prototype.constructor = CheckboxEditor;
+	
+	CheckboxEditor.prototype.init = function () {
+		var
+			self  = this,
+			checked  = this.getValue() || false,
+			input = document.createElement( 'input' );
+		
+		input.className = this.editor_class;
+		input.setAttribute( 'type', 'checkbox' );
+		input.checked = checked;
+		this.cell.insertBefore( input, this.cell.firstChild );
+		
+		this.editor = input;
+		
+		util.addEvent( input, 'change', function () {
+			self.setValue( this.checked );
+		});
+	};
+	
+	HiddenEditor = function ( column_name, row ) {
+		BaseEditor.call( this, column_name, row );
+	};
+	
+	HiddenEditor.prototype = new BaseEditor();
+	HiddenEditor.prototype.constructor = HiddenEditor;
+	
+	HiddenEditor.prototype.init = function () {
+		var
+			hidden = document.createElement( 'div' );
+		
+		hidden.className = this.editor_class +'-hidden';
+		this.cell.insertBefore( hidden, this.cell.firstChild );
+		
+		this.editor = hidden;
+	};
+	
+	/**
+	 * Row Editor manager
+	 */
+	var Editor = function () {
+		this.editingId  = null;
+		this.editingMap = {};
+		this.onChange   = null;
+	};
+	
+	Editor.prototype.getEditorType = function ( edit_type ) {
+		var editor_type, constructor;
+		
+		if ( edit_type === 'text' ) {
+			editor_type = 'text';
+			constructor = TextEditor;
+		}
+		else if ( edit_type === 'number' ) {
+			editor_type = 'number';
+			constructor = NumberEditor;
+		}
+		else if ( util.isArray( edit_type ) ) {
+			editor_type = 'select';
+			constructor = SelectEditor;
+		}
+		else if ( util.isObject( edit_type ) ) {
+			editor_type = 'advancedSelect';
+			constructor = AdvancedSelectEditor;
+		}
+		else if ( edit_type === 'date' ) {
+			editor_type = 'date';
+			constructor = DateEditor;
+		}
+		else if ( edit_type === 'time' ) {
+			editor_type = 'time';
+			constructor = TimeEditor;
+		}
+		else if ( edit_type === 'checkbox' ) {
+			editor_type = 'checkbox';
+			constructor = CheckboxEditor;
+		}
+		else if ( edit_type === 'hidden' ) {
+			editor_type = 'hidden';
+			constructor = HiddenEditor;
+		}
+		else {
+			editor_type = 'none';
+			constructor = BaseEditor;
+		}
+		
+		return {
+			type        : editor_type,
+			Constructor : constructor
+		};
+	};
+	
+	Editor.prototype._editCell = function ( column, edit_type ) {
+		var cell_editor,
+			editor      = this.getEditorType( edit_type ),
+			editor_type = editor.type;
+		
+		cell_editor = new editor.Constructor( column, this.row );
+		cell_editor.init({
+			values : edit_type
+		});
+		
+		this.addChangeHandler( cell_editor );
+		
+		this.editingMap[ column ] = {
+			type   : editor_type,
+			editor : cell_editor
+		};
+	};
+	
+	Editor.prototype.start = function ( row, edit_map ) {
+		var column;
+		
+		// prevent double editing row
+		if ( this.editingId === row.id ) {
+			return;
+		}
+		if ( this.editingId ) {
+			this.end();
+		}
+		this.row       = row;
+		this.editingId = row.id;
+		
+		this.editingMap = {};
+		
+		for ( column in edit_map ) {
 			if ( edit_map.hasOwnProperty( column ) ) {
 				this._editCell( column, edit_map[ column ] );
 			}
 		}
-  };
-  
-  Editor.prototype.change = function ( edit_map ) {
-    var column, edit_type, editor, editor_type;
+	};
+	
+	Editor.prototype.change = function ( edit_map ) {
+		var column, edit_type, editor, editor_type;
 
-    if ( ! this.editingId ) {
-      return;
-    }
-    
-    for ( column in edit_map ) {
+		if ( ! this.editingId ) {
+			return;
+		}
+		
+		for ( column in edit_map ) {
 			if ( edit_map.hasOwnProperty( column ) ) {
 				edit_type   = edit_map[ column ];
 				editor      = this.getEditorType( edit_map[ column ] );
@@ -1062,61 +1066,61 @@ DivTable.prototype._buildRowEditor = function () {
 					this._editCell( column, edit_map[ column ] );
 				}
 			}
-    }
-  };
-  
-  Editor.prototype.end = function () {
-    var column, editor;
-    
-    for ( column in this.editingMap ) {
-      if ( this.editingMap.hasOwnProperty( column ) ) {
-        editor = this.editingMap[ column ].editor;
-        editor.destroy();
-        delete this.editingMap[ column ];
-      }
-    }
-    
-    if ( this.editingId ) {
-      if ( typeof this.onEnd === 'function' ) {
-        this.onEnd.call( self, this.row );
-      }
-      
-      self._updateHtmlRow( this.editingId );
-    }
-    
-    this.row        = null;
-    this.editingId  = null;
-  };
-  
-  Editor.prototype.addChangeHandler = function ( editor ) {
-    editor.subscribe( 'change', function ( arg_map ) {
-      if ( typeof this.onChange === 'function' ) {
-        this.onChange.call( self, arg_map.column, arg_map.value );
-      }
-    }, this );
-  };
-  
-  Editor.prototype.getRow = function () {
-    return this.row;
-  };
-  
-  Editor.prototype.getRowId = function () {
-    return this.editingId;
-  };
-  
-  Editor.prototype.updateRow = function ( new_values ) {
-    var column;
-    
-    for ( column in new_values ) {
-      if ( new_values.hasOwnProperty( column ) ) {
-        if ( this.editingMap.hasOwnProperty( column ) ) {
-          this.editingMap[ column ].editor.update( new_values[ column ] );
-        }
-      }
-    }
-  };
-  
-  this._editor = new Editor();
+		}
+	};
+	
+	Editor.prototype.end = function () {
+		var column, editor;
+		
+		for ( column in this.editingMap ) {
+			if ( this.editingMap.hasOwnProperty( column ) ) {
+				editor = this.editingMap[ column ].editor;
+				editor.destroy();
+				delete this.editingMap[ column ];
+			}
+		}
+		
+		if ( this.editingId ) {
+			if ( typeof this.onEnd === 'function' ) {
+				this.onEnd.call( self, this.row );
+			}
+			
+			self._updateHtmlRow( this.editingId );
+		}
+		
+		this.row        = null;
+		this.editingId  = null;
+	};
+	
+	Editor.prototype.addChangeHandler = function ( editor ) {
+		editor.subscribe( 'change', function ( arg_map ) {
+			if ( typeof this.onChange === 'function' ) {
+				this.onChange.call( self, arg_map.column, arg_map.value );
+			}
+		}, this );
+	};
+	
+	Editor.prototype.getRow = function () {
+		return this.row;
+	};
+	
+	Editor.prototype.getRowId = function () {
+		return this.editingId;
+	};
+	
+	Editor.prototype.updateRow = function ( new_values ) {
+		var column;
+		
+		for ( column in new_values ) {
+			if ( new_values.hasOwnProperty( column ) ) {
+				if ( this.editingMap.hasOwnProperty( column ) ) {
+					this.editingMap[ column ].editor.update( new_values[ column ] );
+				}
+			}
+		}
+	};
+	
+	this._editor = new Editor();
 };
 
 /**
@@ -1126,44 +1130,44 @@ DivTable.prototype._buildRowEditor = function () {
  *  return: -
  */
 DivTable.prototype._editRow = function ( row ) {
-  var row_map, edit_map;
-  
-  if ( typeof row === 'string' ) {
-    row = this.findRowById( row );
-  }
-  
-  row_map  = this._getRowById( row.id );
-  edit_map = this.edit.getEdit( row_map );
+	var row_map, edit_map;
+	
+	if ( typeof row === 'string' ) {
+		row = this.findRowById( row );
+	}
+	
+	row_map  = this._getRowById( row.id );
+	edit_map = this.edit.getEdit( row_map );
 
-  this._editor.start( row, edit_map );
-  this._editor.onChange = function ( column, new_value ) {
-    var values,
-      depend  = this.edit.getDepend(),
-      row_map = this._getRowById( row.id ),
-      edit    = this.edit.getEdit  ( row_map );
-    
-    if ( util.inArray( column, depend ) ) {
-      this._editor.change( edit );
-      
-      values = this._getRowById( row.id );
-      if ( values ) {
-        this._checkRowValues( values );
-      }
-    }
-    
-    this._emitCallback( 'onChange', [ column, new_value, row ] );
-  };
-  this._editor.onEnd = function ( row ) {
-    if ( ! row ) { return; }
-    var
-      id = row.id,
-      values = this._getRowById( id );
-    
-    if ( values ) {
-      this._checkRowValues( values );
-    }
-    this._editor.onEnd = null;
-  };
+	this._editor.start( row, edit_map );
+	this._editor.onChange = function ( column, new_value ) {
+		var values,
+			depend  = this.edit.getDepend(),
+			row_map = this._getRowById( row.id ),
+			edit    = this.edit.getEdit  ( row_map );
+		
+		if ( util.inArray( column, depend ) ) {
+			this._editor.change( edit );
+			
+			values = this._getRowById( row.id );
+			if ( values ) {
+				this._checkRowValues( values );
+			}
+		}
+		
+		this._emitCallback( 'onChange', [ column, new_value, row ] );
+	};
+	this._editor.onEnd = function ( row ) {
+		if ( ! row ) { return; }
+		var
+			id = row.id,
+			values = this._getRowById( id );
+		
+		if ( values ) {
+			this._checkRowValues( values );
+		}
+		this._editor.onEnd = null;
+	};
 };
 
 
@@ -1174,110 +1178,129 @@ DivTable.prototype._editRow = function ( row ) {
  *  return: -
  */
 DivTable.prototype._buildTableStructure = function ( container ) {
-  var
-    i, len, base_html, rows, buttons, cur,
-    header, filter,    filter_btn,
-    prefix       = this.options.class_prefix,
-    col          = this.options.columns,
-    footer       = this.options.footer,
-    footer_class = ( this.options.disable_footer ) ? ( prefix +'-'+ this.options.disable_class ) : '',
-    scroll_w = util.getScrollWidth();
-  
-  container.innerHTML = '';
-  container.classList.add( prefix +'-table' );
-  
-  /**
-   * Create table header
-   */
-  rows = [];
-  for ( i = 0, len = col.length; i < len; ++i ) {
-    cur = col[ i ];
-    rows.push ( ''
-      + (( cur.name ) ? 'id="'+ cur.name +'"' : '' )
-      + 'class="'+ prefix +'-cell cell-'+ i +'"'
-      + '>'+ cur.text
-    );
-  }
-  
-  base_html = ''
-    + '<div class="'+ prefix +'-header">'
-      + '<div '+ rows.join ( '</div><div ' )
-    + '</div>';
-  
-  container.innerHTML += base_html;
-  
-  /**
-   * Create filter row
-   */
-  rows = [];
-  for ( i = 0, len = col.length; i < len; ++i ) {
-    cur = col[ i ];
-    rows.push ( ''
-      + (( cur.name ) ? 'id="'+ cur.name +'"' : '' )
-      + 'class="'+ prefix +'-cell cell-'+ i +'"'
-      + '><input></input>'
-    );
-  }
-  
-  base_html = ''
-    + '<div class="'+ prefix +'-header-filter">'
-      + '<div '+ rows.join ( '</div><div ' )
-    + '</div>';
-  
-  container.innerHTML += base_html;
-  
-  /**
-   * Create table body
-   */
-  base_html = ''
-    + '<div class="'+ prefix +'-body"></div>';
-  
-  container.innerHTML += base_html;
-  
-  /**
-   * Create footer
-   */
-  buttons = [];
-  for ( i = 0, len = footer.length; i < len; ++i ) {
-    cur = footer[ i ];
-    buttons.push(
-      'class="ui-state-default '+ prefix +'-footer-button '+ footer_class +'" name="'+ cur +'">'
-        + '<span class="ui-icon ui-icon-'+ cur +'"></span>'
-    );
-  }
-  base_html = ''
-    + '<div class="'+ prefix +'-footer">'
-      + ( ( buttons.length ) ? '<div '+ buttons.join ( '</div><div ' ) +'</div>' : '' )
-      + '<div class="'+ prefix +'-footer-counter"></div>'
-    + '</div';
-  
-  container.innerHTML += base_html;
-  
-  /**
-   * Create upper right filter button
-   */
-  base_html = ''
-    + '<div class="'+ prefix +'-filter">'
-      + '<span></span>'
-    + '</div>';
-  
-  container.innerHTML += base_html;
-  
-  /**
-   * Fix the size of the header and of the filter button
-   */
-  container.style.position = 'relative';
-  
-  header = container.querySelector( '.'+ prefix +'-header' );
-  header.style.width = '-webkit-calc(100% - '+ scroll_w +'px)';
-  header.style.width =         'calc(100% - '+ scroll_w +'px)';
-  
-  filter = container.querySelector( '.'+ prefix +'-header-filter' );
-  filter.style.width = '-webkit-calc(100% - '+ scroll_w +'px)';
-  filter.style.width =         'calc(100% - '+ scroll_w +'px)';
-  
-  filter_btn = container.querySelector( '.'+ prefix +'-filter' );
-  filter_btn.style.width = scroll_w +'px';
+	var
+		i, len, base_html, rows, buttons, cur,
+		header, filter,    filter_btn,
+		prefix       = this.options.class_prefix,
+		col          = this.options.columns,
+		footer       = this.options.footer,
+		footer_class = ( this.options.disable_footer ) ? ( prefix +'-'+ this.options.disable_class ) : '',
+		scroll_w = util.getScrollWidth();
+	
+	container.innerHTML = '';
+	container.classList.add( prefix +'-table' );
+	
+	/**
+	 * Create table header
+	 */
+	rows = [];
+	for ( i = 0, len = col.length; i < len; ++i ) {
+		cur = col[ i ];
+		rows.push ( ''
+			+ (( cur.name ) ? 'id="'+ cur.name +'"' : '' )
+			+ 'class="'+ prefix +'-cell cell-'+ i +'"'
+			+ '>'+ cur.text
+		);
+	}
+	
+	base_html = ''
+		+ '<div class="'+ prefix +'-header">'
+			+ '<div '+ rows.join ( '</div><div ' )
+		+ '</div>';
+	
+	container.innerHTML += base_html;
+	
+	/**
+	 * Create filter row
+	 */
+	rows = [];
+	for ( i = 0, len = col.length; i < len; ++i ) {
+		cur = col[ i ];
+		rows.push ( ''
+			+ (( cur.name ) ? 'id="'+ cur.name +'"' : '' )
+			+ 'class="'+ prefix +'-cell cell-'+ i +'"'
+			+ '><input></input>'
+		);
+	}
+	
+	base_html = ''
+		+ '<div class="'+ prefix +'-header-filter">'
+			+ '<div '+ rows.join ( '</div><div ' )
+		+ '</div>';
+	
+	container.innerHTML += base_html;
+	
+	/**
+	 * Create table body
+	 */
+	base_html = ''
+		+ '<div class="'+ prefix +'-body"></div>';
+	
+	container.innerHTML += base_html;
+	
+	/**
+	 * Create footer
+	 */
+	buttons = [];
+	for ( i = 0, len = footer.length; i < len; ++i ) {
+		cur = footer[ i ];
+		buttons.push(
+			'class="ui-state-default '+ prefix +'-footer-button '+ footer_class +'" name="'+ cur +'">'
+				+ '<span class="ui-icon ui-icon-'+ cur +'"></span>'
+		)
+	}
+	base_html = ''
+		+ '<div class="'+ prefix +'-footer">'
+			+ ( ( buttons.length ) ? '<div '+ buttons.join ( '</div><div ' ) +'</div>' : '' );
+
+	// Add pagination if requested
+	if ( this.options.pagination ) {
+		base_html += ''
+			+ '<div class="'+ prefix +'-pages">'
+				+ '<div class="'+ prefix +'-pages-first '+ prefix +'-footer-button" name="first"><span class="ui-icon ui-icon-seek-first"></span></div>'
+				+ '<div class="'+ prefix +'-pages-prev  '+ prefix +'-footer-button" name="prev" ><span class="ui-icon ui-icon-seek-prev" ></span></div>'
+				+ '<div class="'+ prefix +'-pages-curr" >'
+					+ '<div class="'+ prefix +'-pages-curr-page" >'+ this.options.pagination_page  +'</div>'
+					+ '<input class="'+ prefix +'-pages-curr-input"></input>'
+					+ '<div class="'+ prefix +'-pages-curr-ttext">'+ this.options.pagination_total +'</div>'
+					+ '<div class="'+ prefix +'-pages-curr-total"> 0 </div>'
+				+ '</div>'
+				+ '<div class="'+ prefix +'-pages-next  '+ prefix +'-footer-button" name="next" ><span class="ui-icon ui-icon-seek-next"></span></div>'
+				+ '<div class="'+ prefix +'-pages-end   '+ prefix +'-footer-button" name="end"  ><span class="ui-icon ui-icon-seek-end" ></span></div>'
+			+ '</div>';
+	}
+
+	base_html += ''
+			+ '<div class="'+ prefix +'-footer-counter"></div>'
+		+ '</div';
+	
+	container.innerHTML += base_html;
+	
+	/**
+	 * Create upper right filter button
+	 */
+	base_html = ''
+		+ '<div class="'+ prefix +'-filter">'
+			+ '<span></span>'
+		+ '</div>';
+	
+	container.innerHTML += base_html;
+	
+	/**
+	 * Fix the size of the header and of the filter button
+	 */
+	container.style.position = 'relative';
+	
+	header = container.querySelector( '.'+ prefix +'-header' );
+	header.style.width = '-webkit-calc(100% - '+ scroll_w +'px)';
+	header.style.width =         'calc(100% - '+ scroll_w +'px)';
+	
+	filter = container.querySelector( '.'+ prefix +'-header-filter' );
+	filter.style.width = '-webkit-calc(100% - '+ scroll_w +'px)';
+	filter.style.width =         'calc(100% - '+ scroll_w +'px)';
+	
+	filter_btn = container.querySelector( '.'+ prefix +'-filter' );
+	filter_btn.style.width = scroll_w +'px';
 };
 
 /**
@@ -1287,62 +1310,67 @@ DivTable.prototype._buildTableStructure = function ( container ) {
  *  return: [string] form of the row constructed DOM object
  */
 DivTable.prototype._getRowHtml = function ( row_map ) {
-  var i,  len,   to_hide, edit,
-    name, value, text,
-    col    = this.options.columns,
-    prefix = this.options.class_prefix,
-    cells  = [],
-    row_html = '';
-  
-  if ( row_map !== null && util.isObject( row_map ) ) {
-    if ( this.edit ) {
-      edit    = this.edit.getEdit  ( row_map, true );
-      to_hide = this.edit.getHidden( row_map );
-    }
-    else {
-      edit    = {};
-      to_hide = [];
-    }
-    
-    for ( i = 0, len = col.length; i < len; i++ ) {
-      name  = col[ i ].name;
-      value = text = ( row_map[ name ] == null   ) ? '' :                  //don't display the null, undefined
-                     ( row_map[ name ] !== false ) ? row_map[ name ] : ''; //and the false value
-      
-      if ( util.isObject( edit[ name ] ) ) {
-        text = edit[ name ][ value ];
-        if ( text === undefined ) {
-          text = value;
-        }
-      }
-      
-      cells.push(
-        'class="'+ prefix +'-cell cell-'+ i +'" name="'+ name +'">'
-          + '<div class="cell-val" value="'+ value +'">'+ text +'</div>'
-      );
-    }
-    row_html = ''
-      + '<div class="'+ prefix +'-row" id="'+ row_map.id +'">'
-        + '<div '+ cells.join( '</div><div ' ) +'</div>'
-      + '</div>';
-  }
-  
-  return row_html;
+	var i,  len,   to_hide, edit,
+		name, value, text,
+		col    = this.options.columns,
+		prefix = this.options.class_prefix,
+		cells  = [],
+		row_html = '';
+	
+	if ( row_map !== null && util.isObject( row_map ) ) {
+		if ( this.edit ) {
+			edit    = this.edit.getEdit  ( row_map, true );
+			to_hide = this.edit.getHidden( row_map );
+		}
+		else {
+			edit    = {};
+			to_hide = [];
+		}
+		
+		for ( i = 0, len = col.length; i < len; i++ ) {
+			name  = col[ i ].name;
+			value = text = ( row_map[ name ] == null   ) ? '' :                  //don't display the null, undefined
+										 ( row_map[ name ] !== false ) ? row_map[ name ] : ''; //and the false value
+			
+			if ( util.isObject( edit[ name ] ) ) {
+				text = edit[ name ][ value ];
+				if ( text === undefined ) {
+					text = value;
+				}
+			}
+			
+			cells.push(
+				'class="'+ prefix +'-cell cell-'+ i +'" name="'+ name +'">'
+					+ '<div class="cell-val" value="'+ value +'">'+ text +'</div>'
+			);
+		}
+		row_html = ''
+			+ '<div class="'+ prefix +'-row" id="'+ row_map.id +'">'
+				+ '<div '+ cells.join( '</div><div ' ) +'</div>'
+			+ '</div>';
+	}
+	
+	return row_html;
 };
 
 /**
  * Build the HTML of ALL the table's ROWS
  */
 DivTable.prototype._getRowsHtml = function () {
-  var i, len,
-    rows = this._getRows(),
-    rows_html = '';
-  
-  for ( i = 0, len = rows.length; i < len; i++ ) {
-    rows_html += this._getRowHtml( rows[ i ] );
-  }
-  
-  return rows_html;
+	var i, len, int,
+		rows = this._getRows(),
+		rows_html = '';
+	
+	if ( this.options.pagination ) {
+		int  = this._getRowsInterval();
+		rows = rows.slice( int.start, int.stop );
+	}
+
+	for ( i = 0, len = rows.length; i < len; i++ ) {
+		rows_html += this._getRowHtml( rows[ i ] );
+	}
+	
+	return rows_html;
 };
 
 
@@ -1356,31 +1384,31 @@ DivTable.prototype._getRowsHtml = function () {
  *  return: -
  */
 DivTable.prototype._selectRow = function ( row ) {
-  var i, len, selected,
-    body      = this.domMap.body,
-    sel_class = this.options.select_class;
-  
-  if ( typeof row === 'string' ) {
-    row = this.findRowById( row );
-  }
-  
-  if ( ! row || row.classList.contains( sel_class ) ) {
-    return;
-  }
-  
-  selected = body.querySelectorAll( '.'+ sel_class );
-  for ( i = 0, len = selected.length; i < len; i++ ) {
-    selected[ i ].classList.remove( sel_class );
-  }
-  
-  row.classList.add( sel_class );
-  
-  this._scrollToRow( row );
-  this._emitCallback( 'onSelectRow', row );
-  
-  if ( this.options.auto_edit ) {
-    this._editRow( row.id );
-  }
+	var i, len, selected,
+		body      = this.domMap.body,
+		sel_class = this.options.select_class;
+	
+	if ( typeof row === 'string' ) {
+		row = this.findRowById( row );
+	}
+	
+	if ( ! row || row.classList.contains( sel_class ) ) {
+		return;
+	}
+	
+	selected = body.querySelectorAll( '.'+ sel_class );
+	for ( i = 0, len = selected.length; i < len; i++ ) {
+		selected[ i ].classList.remove( sel_class );
+	}
+	
+	row.classList.add( sel_class );
+	
+	this._scrollToRow( row );
+	this._emitCallback( 'onSelectRow', row );
+	
+	if ( this.options.auto_edit ) {
+		this._editRow( row.id );
+	}
 };
 
 /**
@@ -1389,12 +1417,12 @@ DivTable.prototype._selectRow = function ( row ) {
  *  return: [DOM] the DOM element of the selected row
  */
 DivTable.prototype._getSelectedRow = function () {
-  var
-    body      = this.domMap.body,
-    sel_class = this.options.select_class,
-    selected  = body.querySelectorAll( '.'+ sel_class );
-  
-  return selected[ 0 ] || {};
+	var
+		body      = this.domMap.body,
+		sel_class = this.options.select_class,
+		selected  = body.querySelectorAll( '.'+ sel_class );
+	
+	return selected[ 0 ] || {};
 };
 
 /**
@@ -1404,41 +1432,41 @@ DivTable.prototype._getSelectedRow = function () {
  *  return: -
  */
 DivTable.prototype._scrollToRow = function ( row ) {
-  var
-    scroll, start, stop, direction,
-    interval    = 20,
-    speed       = 3,             //3 px/ms -> 3000 px/s
-    that        = this,
-    body        = this.domMap.body,
-    body_scroll = body.scrollTop,
-    body_heigth = body.offsetHeight,
-    offset      = row.offsetTop - body.offsetTop,
-    row_heigth  = row.offsetHeight;
-  
-  if ( this._isScrolling ) { return; }
-  
-  start = body_scroll;
-  if ( offset < body_scroll ) {
-    stop = offset;
-  }
-  else if ( offset + row_heigth > body_scroll + body_heigth ) {
-    stop = offset - body_heigth + row_heigth;
-  }
-  else {
-    return;
-  }
-  
-  direction = ( start > stop ) ? -speed * interval : speed * interval;
-  this._isScrolling = true;
-  scroll = setInterval( function () {
-    body.scrollTop += direction;
-    if ( ( direction >  0 && body.scrollTop >= stop )
-      || ( direction <= 0 && body.scrollTop <= stop ) ) {
-      body.scrollTop = stop;
-      clearInterval( scroll );
-      that._isScrolling = false;
-    }
-  }, interval );
+	var
+		scroll, start, stop, direction,
+		interval    = 20,
+		speed       = 3,             //3 px/ms -> 3000 px/s
+		that        = this,
+		body        = this.domMap.body,
+		body_scroll = body.scrollTop,
+		body_heigth = body.offsetHeight,
+		offset      = row.offsetTop - body.offsetTop,
+		row_heigth  = row.offsetHeight;
+	
+	if ( this._isScrolling ) { return; }
+	
+	start = body_scroll;
+	if ( offset < body_scroll ) {
+		stop = offset;
+	}
+	else if ( offset + row_heigth > body_scroll + body_heigth ) {
+		stop = offset - body_heigth + row_heigth;
+	}
+	else {
+		return;
+	}
+	
+	direction = ( start > stop ) ? -speed * interval : speed * interval;
+	this._isScrolling = true;
+	scroll = setInterval( function () {
+		body.scrollTop += direction;
+		if ( ( direction >  0 && body.scrollTop >= stop )
+			|| ( direction <= 0 && body.scrollTop <= stop ) ) {
+			body.scrollTop = stop;
+			clearInterval( scroll );
+			that._isScrolling = false;
+		}
+	}, interval );
 };
 
 /******************************************************************************
@@ -1449,18 +1477,25 @@ DivTable.prototype._scrollToRow = function ( row ) {
  *  return: -
  */
 DivTable.prototype._setDomMap = function ( container ) {
-  var prefix = this.options.class_prefix;
-  
-  this.domMap = {
-    table : container,
-    
-    body         : container.querySelector( '.'+ prefix +'-body'           ),
-    filter_btn   : container.querySelector( '.'+ prefix +'-filter'         ),
-    footer_count : container.querySelector( '.'+ prefix +'-footer-counter' ),
-    
-    filter_inputs : container.querySelectorAll( '.'+ prefix +'-header-filter input' ),
-    footer_btns   : container.querySelectorAll( '.'+ prefix +'-footer-button' )
-  };
+	var prefix = this.options.class_prefix;
+	
+	this.domMap = {
+		table : container,
+		
+		body         : container.querySelector( '.'+ prefix +'-body'           ),
+		filter_btn   : container.querySelector( '.'+ prefix +'-filter'         ),
+		footer_count : container.querySelector( '.'+ prefix +'-footer-counter' ),
+		
+		filter_inputs : container.querySelectorAll( '.'+ prefix +'-header-filter input' ),
+		footer_btns   : container.querySelectorAll( '.'+ prefix +'-footer-button' ),
+
+		page_first : container.querySelector( '.'+ prefix +'-pages-first'      ),
+		page_prev  : container.querySelector( '.'+ prefix +'-pages-prev'       ),
+		page_next  : container.querySelector( '.'+ prefix +'-pages-next'       ),
+		page_end   : container.querySelector( '.'+ prefix +'-pages-end'        ),
+		page_curr  : container.querySelector( '.'+ prefix +'-pages-curr-input' ),
+		page_total : container.querySelector( '.'+ prefix +'-pages-curr-total' )
+	};
 };
 
 
@@ -1470,71 +1505,71 @@ DivTable.prototype._setDomMap = function ( container ) {
  *  return: -
  */
 DivTable.prototype._addEventHandlers = function () {
-  var
-    self          = this,
-    prefix        = this.options.class_prefix,
-    body          = this.domMap.body,
-    filter_inputs = this.domMap.filter_inputs,
-    footer_btns   = this.domMap.footer_btns,
-    filter_btn    = this.domMap.filter_btn;
-    
-  /**
-   * Input filters
-   */
-  util.addEvent( filter_inputs, 'keyup', function () {
-    var
-      id    = this.parentNode.id,
-      value = this.value;
-    
-    self._updateFilter( id, value );
-  });
-    
-  /**
-   * Footer buttons
-   */
-  if ( footer_btns.length ) {
-    util.addEvent( footer_btns, 'mousedown', function () {
-      self._footerBtnClick.call( self, this ); 
-    });
-  }
-  /**
-   * Filter button
-   */
-  util.addEvent( filter_btn, 'click', function ( evt ) {
-    self._showFilterMenu( evt, this );
-  });
-  
-  /**
-   * Row selection
-   */
-  util.addEvent( body, 'click', function ( evt ) {
-    var row,
-      row_class = prefix +'-row',
-      findParent = function ( node, class_name ) {
-        if ( node ) {
-          if ( node.classList && node.classList.contains( class_name ) ) {
-            return node;
-          }
-          else {
-            return findParent( node.parentNode, class_name );
-          }
-        }
-        else {
-          return null;
-        }
-      };
-    
-    if ( evt.target.classList.contains( row_class ) ) {
-      row = evt.target;
-    }
-    else {
-      row = findParent( evt.target.parentNode, row_class );
-    }
-    
-    if ( row ) {
-      self._selectRow.call( self, row );
-    }
-  });
+	var
+		self          = this,
+		prefix        = this.options.class_prefix,
+		body          = this.domMap.body,
+		filter_inputs = this.domMap.filter_inputs,
+		footer_btns   = this.domMap.footer_btns,
+		filter_btn    = this.domMap.filter_btn;
+		
+	/**
+	 * Input filters
+	 */
+	util.addEvent( filter_inputs, 'keyup', function () {
+		var
+			id    = this.parentNode.id,
+			value = this.value;
+		
+		self._updateFilter( id, value );
+	});
+		
+	/**
+	 * Footer buttons
+	 */
+	if ( footer_btns.length ) {
+		util.addEvent( footer_btns, 'mousedown', function () {
+			self._footerBtnClick.call( self, this ); 
+		});
+	}
+	/**
+	 * Filter button
+	 */
+	util.addEvent( filter_btn, 'click', function ( evt ) {
+		self._showFilterMenu( evt, this );
+	});
+	
+	/**
+	 * Row selection
+	 */
+	util.addEvent( body, 'click', function ( evt ) {
+		var row,
+			row_class = prefix +'-row',
+			findParent = function ( node, class_name ) {
+				if ( node ) {
+					if ( node.classList && node.classList.contains( class_name ) ) {
+						return node;
+					}
+					else {
+						return findParent( node.parentNode, class_name );
+					}
+				}
+				else {
+					return null;
+				}
+			};
+		
+		if ( evt.target.classList.contains( row_class ) ) {
+			row = evt.target;
+		}
+		else {
+			row = findParent( evt.target.parentNode, row_class );
+		}
+		
+		if ( row ) {
+			self._selectRow.call( self, row );
+		}
+	});
 };
 
 
@@ -1544,24 +1579,30 @@ DivTable.prototype._addEventHandlers = function () {
  *  return: text used in the footer
  */
 DivTable.prototype._updateCounterText = function () {
-  var
-    key,
-    text  = this.options.counter_text,
-    count = this.getRowCount(),
-    value_map = {
-      from  : 1,
-      to    : count,
-      total : count
-    };
-  
-  for ( key in value_map ) {
+	var
+		key, interval,
+		text  = this.options.counter_text,
+		count = this.getRowCount(),
+		value_map = {
+			from  : 1,
+			to    : count,
+			total : count
+		};
+	
+	if ( this.options.pagination ) {
+		interval = this._getRowsInterval();
+		value_map.from = Math.max( 1, interval.start + 1 );
+		value_map.to   = Math.min( interval.stop, count  );
+	}
+
+	for ( key in value_map ) {
 		if ( value_map.hasOwnProperty( key ) ) {
 			text = text.split( '{{'+ key +'}}' ).join( value_map[ key ] );
 		}
-  }
-  
-  this.domMap.footer_count.innerHTML = text;
-  return text;
+	}
+	
+	this.domMap.footer_count.innerHTML = text;
+	return text;
 };
 
 /**
@@ -1570,10 +1611,11 @@ DivTable.prototype._updateCounterText = function () {
  *  return: -
  */
 DivTable.prototype._updateTable = function () {
-  this.endEditRow();
-  
-  this.domMap.body.innerHTML = this._getRowsHtml();
-  this._updateCounterText();
+	this.endEditRow();
+	
+	this.domMap.body.innerHTML = this._getRowsHtml();
+	this._updateCounterText();
+	this._updatePagination();
 };
 
 /**
@@ -1583,29 +1625,29 @@ DivTable.prototype._updateTable = function () {
  *  return: -
  */
 DivTable.prototype._updateHtmlRow = function ( row ) {
-  var values_map, new_row_html, use_element, new_row,
-    sel_class   = this.options.select_class,
-    is_selected = false;
-  
-  if ( typeof row === 'string' ) {
-    row = this.findRowById( row );
-  }
-  
-  is_selected  = row.classList.contains( sel_class );
-  values_map   = this._getRowById( row.id );
-  if ( ! values_map ) { return; }
-  this._checkRowValues( values_map );
-  new_row_html = this._getRowHtml( values_map );
-  
-  use_element = document.createElement( 'div' );
-  use_element.innerHTML = new_row_html;
-  
-  new_row = use_element.firstChild;
-  
-  row.parentNode.replaceChild( new_row, row );
-  if ( is_selected ) {
-    new_row.classList.add( sel_class );
-  }
+	var values_map, new_row_html, use_element, new_row,
+		sel_class   = this.options.select_class,
+		is_selected = false;
+	
+	if ( typeof row === 'string' ) {
+		row = this.findRowById( row );
+	}
+	
+	is_selected  = row.classList.contains( sel_class );
+	values_map   = this._getRowById( row.id );
+	if ( ! values_map ) { return; }
+	this._checkRowValues( values_map );
+	new_row_html = this._getRowHtml( values_map );
+	
+	use_element = document.createElement( 'div' );
+	use_element.innerHTML = new_row_html;
+	
+	new_row = use_element.firstChild;
+	
+	row.parentNode.replaceChild( new_row, row );
+	if ( is_selected ) {
+		new_row.classList.add( sel_class );
+	}
 };
 
 /**
@@ -1615,15 +1657,42 @@ DivTable.prototype._updateHtmlRow = function ( row ) {
  *  return: -
  */
 DivTable.prototype._footerBtnClick = function ( button ) {
-  var 
-    prefix        = this.options.class_prefix,
-    disable_class = prefix +'-'+ this.options.disable_class,
-    name          = button.getAttribute( 'name' );
-  
-  if ( ! button.classList.contains( disable_class ) ) {
-    this._emitCallback( 'onFooterClick', name );
-  }
-  
+	var 
+		prefix        = this.options.class_prefix,
+		disable_class = prefix +'-'+ this.options.disable_class,
+		name          = button.getAttribute( 'name' );
+	
+	if ( ! button.classList.contains( disable_class ) ) {
+		if ( button.parentNode.classList.contains( prefix +'-pages' ) ) {
+			this._pagesBtnClick.call( this, button );
+		}
+		else {
+			this._emitCallback( 'onFooterClick', name );
+		}
+	}
+	
+};
+
+/**
+ * Pagination buttons click
+ *  params:
+ *    - button[DOM]: button clicked
+ *  return: -
+ */
+DivTable.prototype._pagesBtnClick = function ( button ) {
+	var
+		prefix        = this.options.class_prefix,
+		disable_class = prefix +'-'+ this.options.disable_class,
+		name          = button.getAttribute( 'name' );
+
+	switch ( name ) {
+		case 'first' : this._showFirstPage(); break;
+		case 'prev'  : this._showPrevPage (); break;
+		case 'next'  : this._showNextPage (); break;
+		case 'end'   : this._showEndPage  (); break;
+		default:
+			console.warn( 'Button with name %s not known!', name );
+	}
 };
 
 /**
@@ -1634,36 +1703,203 @@ DivTable.prototype._footerBtnClick = function ( button ) {
  *  return: -
  */
 DivTable.prototype._showFilterMenu = function ( e, that ) {
-  if ( this.options.showFilterMenu ) {
-    this.options.showFilterMenu.call( this.domMap.table, e, that );
-    console.log( 'custom filter' );
-  }
-  else {
-    this.domMap.table.classList.toggle( this.options.filter_class );
-  }
+	if ( this.options.showFilterMenu ) {
+		this.options.showFilterMenu.call( this.domMap.table, e, that );
+		console.log( 'custom filter' );
+	}
+	else {
+		this.domMap.table.classList.toggle( this.options.filter_class );
+	}
 };
 
 /***************************************************************
  * FILTER
  */
 DivTable.prototype.setFilter = function ( new_filter ) {
-  this.filter = new_filter || {};
+	this.filter = new_filter || {};
 };
 
 DivTable.prototype.editFilter = function ( name, value ) {
-  this.filter[ name ] = {
-    likenocase : ''+ value
-  };
+	this.filter[ name ] = {
+		likenocase : ''+ value
+	};
 };
 
 DivTable.prototype.removeFilter = function ( name ) {
-  delete this.filter[ name ];
+	delete this.filter[ name ];
 };
 
 DivTable.prototype._updateFilter = function ( id, value ) {
-  this.editFilter( id, value );
-  
-  this._updateTable();
+	this.editFilter( id, value );
+	
+	this._updateTable();
+};
+
+/********************************************************************
+ * PAGINATION management
+ */
+/**
+ * Show the first page
+ */
+DivTable.prototype._showFirstPage = function () {
+	if ( this.pagination !== 1 ){
+		this.pagination.page = 1;
+		this._updateTable();
+	}
+};
+
+/**
+ * Show the previous page
+ */
+DivTable.prototype._showPrevPage = function () {
+	if ( this.pagination.page > 1 ) {
+		this.pagination.page--;
+		this._updateTable();
+	}
+};
+
+/**
+ * Show the next page
+ */
+DivTable.prototype._showNextPage = function () {
+	var count = this._getPagesCount();
+	if ( this.pagination.page < count ) {
+		this.pagination.page++;
+		this._updateTable();
+	}
+};
+
+/**
+ * Show the last page
+ */
+DivTable.prototype._showEndPage = function () {
+	var count = this._getPagesCount();
+	if ( this.pagination.page !== count ) {
+		this.pagination.page = count;
+		this._updateTable();
+	}
+};
+
+/**
+ * Calculate the number of pages
+ */
+DivTable.prototype._getPagesCount = function () {
+	var
+		rows_in_page = this._getRowsInPage(),
+		rows_count   = this._getRows().length;
+
+	return Math.ceil( rows_count / rows_in_page );
+};
+
+/**
+ * Calculate how many rows can be displayed in the table
+ */
+DivTable.prototype._getRowsInPage = function () {
+	if ( ! this.pagination.rows_pro_page ) {
+		this._calcRowsInPage();
+	}
+	return this.pagination.rows_pro_page;
+};
+
+DivTable.prototype._calcRowsInPage = function () {
+	var id, count, body_h, row_h,
+		body = this.domMap.body,
+		row  = body.querySelector( '.'+ this.options.class_prefix +'-row' );
+
+	if ( ! row ) {
+		id  = 'row-'+ new Date().getTime();
+		row = this._getRowHtml({ id : id });
+		this.domMap.body.innerHTML += row;
+		count = this._getRowsInPage();
+		row = body.querySelector( '#'+ id );
+		row.parentNode.removeChild( row );
+		return count;
+	}
+
+	body_h = body.offsetHeight;
+	row_h  = row.offsetHeight;
+
+	this.pagination.rows_pro_page = Math.floor( body_h / row_h );
+};
+
+/**
+ * Return the interval of pages to display
+ */
+DivTable.prototype._getRowsInterval = function () {
+	var
+		count  = this._getRowsInPage(),
+		offset = count * ( this.pagination.page - 1 );
+
+	return {
+		start : offset,
+		stop  : offset + count
+	};
+};
+
+/**
+ * Update the pagination informations
+ */
+DivTable.prototype._updatePagination = function () {
+	if ( ! this.options.pagination ) { return; }
+	var count = this._getPagesCount();
+
+	this.domMap.page_curr.value  = this.pagination.page;
+	this.domMap.page_total.innerHTML = count;
+
+	this._updatePageButtons();
+};
+
+/**
+ * Enable or disable the pagination buttons
+ */
+DivTable.prototype._updatePageButtons = function () {
+	var current = this.pagination.page,
+		total   = this._getPagesCount();
+
+	if ( current > 1 ) {
+		this._enablePageButtons(['first','prev']);
+	}
+	else {
+		this._disablePageButtons(['first','prev']);
+	}
+
+	if ( current < total ) {
+		this._enablePageButtons(['end','next']);
+	}
+	else {
+		this._disablePageButtons(['end','next']);
+	}
+};
+
+DivTable.prototype._enablePageButtons = function ( buttons ) {
+	var i, len, button,
+		disable_class = this.options.class_prefix +'-'+ this.options.disable_class;
+
+	for ( i = 0, len = buttons.length; i < len; i++ ) {
+		button = this.domMap[ 'page_'+ buttons[i] ];
+		button.classList.remove( disable_class );
+	}
+};
+
+DivTable.prototype._disablePageButtons = function ( buttons ) {
+	var i, len, button,
+		disable_class = this.options.class_prefix +'-'+ this.options.disable_class;
+
+	for ( i = 0, len = buttons.length; i < len; i++ ) {
+		button = this.domMap[ 'page_'+ buttons[i] ];
+		button.classList.add( disable_class );
+	}
+};
+
+DivTable.prototype._onResize = function () {
+	var old;
+	old = this._getRowsInPage();
+
+	this._calcRowsInPage();
+
+	if ( old !== this._getRowsInPage() ) {
+		this._updateTable();
+	}
 };
 
 /********************************************************************
@@ -1677,16 +1913,16 @@ DivTable.prototype._updateFilter = function ( id, value ) {
  *  return: number of rows in the table
  */
 DivTable.prototype.getRowCount = function ( table_id ) {
-  var count = 0;
-  if ( ! table_id ) {
-    count = this._getRows().length;
-  }
-  else {
-    this.table = this._saveMap[ table_id ];
-    count = this._getRows().length;
-    this.table = this._saveMap[ this._currentTableId ];
-  }
-  return count;
+	var count = 0;
+	if ( ! table_id ) {
+		count = this._getRows().length;
+	}
+	else {
+		this.table = this._saveMap[ table_id ];
+		count = this._getRows().length;
+		this.table = this._saveMap[ this._currentTableId ];
+	}
+	return count;
 };
 
 /**
@@ -1696,7 +1932,7 @@ DivTable.prototype.getRowCount = function ( table_id ) {
  *  return: [array] containing the found rows
  */
 DivTable.prototype.getRows = function ( filter ) {
-  return this._getRows( filter );
+	return this._getRows( filter );
 };
 
 /**
@@ -1706,7 +1942,7 @@ DivTable.prototype.getRows = function ( filter ) {
  *  return: [object] values of the row
  */
 DivTable.prototype.getRowById = function ( id ) {
-  return this._getRowById( id );
+	return this._getRowById( id );
 };
 
 /**
@@ -1718,10 +1954,10 @@ DivTable.prototype.getRowById = function ( id ) {
  *  return: [object] values of the row
  */
 DivTable.prototype.getRowValues = function ( row_id ) {
-  var
-    id  = row_id || this._getSelectedRow().id || '',
-    row = this._getRowById( id );
-  return row || {};
+	var
+		id  = row_id || this._getSelectedRow().id || '',
+		row = this._getRowById( id );
+	return row || {};
 };
 
 /**
@@ -1731,7 +1967,7 @@ DivTable.prototype.getRowValues = function ( row_id ) {
  *  return: -
  */
 DivTable.prototype.selectRow = function ( row ) {
-  this._selectRow( row );
+	this._selectRow( row );
 };
 
 /**
@@ -1742,9 +1978,9 @@ DivTable.prototype.selectRow = function ( row ) {
  *  return: -
  */
 DivTable.prototype.editRow = function ( id ) {
-  var selected = id || this._getSelectedRow().id;
-  
-  this._editRow( ''+ selected );
+	var selected = id || this._getSelectedRow().id;
+	
+	this._editRow( ''+ selected );
 };
 
 /**
@@ -1753,7 +1989,7 @@ DivTable.prototype.editRow = function ( id ) {
  *  return: -
  */
 DivTable.prototype.endEditRow = function () {
-  this._editor.end();
+	this._editor.end();
 };
 
 /**
@@ -1763,10 +1999,10 @@ DivTable.prototype.endEditRow = function () {
  *  return: -
  */
 DivTable.prototype.newRow = function ( row_map ) {
-  row_map = row_map || {};
-  
-  this._insertRow( row_map );
-  this._updateTable();
+	row_map = row_map || {};
+	
+	this._insertRow( row_map );
+	this._updateTable();
 };
 
 /**
@@ -1776,14 +2012,14 @@ DivTable.prototype.newRow = function ( row_map ) {
  *  return: -
  */
 DivTable.prototype.newRows = function ( rows_list ) {
-  var i,
-    len = rows_list.length;
-  
-  for ( i = 0; i < len; i++ ) {
-    this._insertRow( rows_list[ i ] );
-  }
-  
-  this._updateTable();
+	var i,
+		len = rows_list.length;
+	
+	for ( i = 0; i < len; i++ ) {
+		this._insertRow( rows_list[ i ] );
+	}
+	
+	this._updateTable();
 };
 
 /**
@@ -1796,18 +2032,18 @@ DivTable.prototype.newRows = function ( rows_list ) {
  *  return: -
  */
 DivTable.prototype.updateRow = function ( row_id, new_values, preventTableUpdate, preventEdited ) {
-  this._updateRow( row_id, new_values, preventEdited );
+	this._updateRow( row_id, new_values, preventEdited );
 
-  if ( ! preventTableUpdate ) {
-    this._editor.end();
-    this._updateTable();
-  }
-  else if ( this._editor.getRowId() == row_id ) {
-    this._editor.updateRow( new_values );
-  }
-  else {
-    this._updateHtmlRow( ''+ row_id );
-  }
+	if ( ! preventTableUpdate ) {
+		this._editor.end();
+		this._updateTable();
+	}
+	else if ( this._editor.getRowId() == row_id ) {
+		this._editor.updateRow( new_values );
+	}
+	else {
+		this._updateHtmlRow( ''+ row_id );
+	}
 };
 
 /**
@@ -1820,16 +2056,16 @@ DivTable.prototype.updateRow = function ( row_id, new_values, preventTableUpdate
  *  return: -
  */
 DivTable.prototype.deleteRow = function ( id, from_db ) {
-  var next = this.findNextRow( id );
-  
-  if ( this._editor.getRowId() === id ) {
-    this._editor.end();
-  }
-  
-  this._deleteRow( id, from_db );
-  this._updateTable();
-  
-  this._selectRow( ''+ next.id );
+	var next = this.findNextRow( id );
+	
+	if ( this._editor.getRowId() === id ) {
+		this._editor.end();
+	}
+	
+	this._deleteRow( id, from_db );
+	this._updateTable();
+	
+	this._selectRow( ''+ next.id );
 };
 
 /**
@@ -1842,12 +2078,12 @@ DivTable.prototype.deleteRow = function ( id, from_db ) {
  *  return: -
  */
 DivTable.prototype.deleteRows = function ( rows_array, from_db ) {
-  var i, len;
-  
-  for ( i = 0, len = rows_array.length - 1; i < len; i++ ) {
-    this._deleteRow( rows_array[ i ].id || rows_array[ i ], from_db );
-  }
-  this.deleteRow( rows_array[ i ].id || rows_array[ i ], from_db );
+	var i, len;
+	
+	for ( i = 0, len = rows_array.length - 1; i < len; i++ ) {
+		this._deleteRow( rows_array[ i ].id || rows_array[ i ], from_db );
+	}
+	this.deleteRow( rows_array[ i ].id || rows_array[ i ], from_db );
 };
 
 /**
@@ -1856,11 +2092,11 @@ DivTable.prototype.deleteRows = function ( rows_array, from_db ) {
  *  return: -
  */
 DivTable.prototype.deleteEditRow = function () {
-  if ( ! this._editor.getRow() ) { return; }
-  var
-    id   = this._editor.getRowId();
-  
-  this.deleteRow( id );
+	if ( ! this._editor.getRow() ) { return; }
+	var
+		id   = this._editor.getRowId();
+	
+	this.deleteRow( id );
 };
 
 /**
@@ -1869,11 +2105,11 @@ DivTable.prototype.deleteEditRow = function () {
  *  return: -
  */
 DivTable.prototype.deleteSelectedRow = function () {
-  var selected = this._getSelectedRow();
-  
-  if ( ! selected ) { return; }
-  
-  this.deleteRow( selected.id );
+	var selected = this._getSelectedRow();
+	
+	if ( ! selected ) { return; }
+	
+	this.deleteRow( selected.id );
 };
 
 /**
@@ -1883,7 +2119,7 @@ DivTable.prototype.deleteSelectedRow = function () {
  *  return: [DOM] of the found row
  */
 DivTable.prototype.findRowById = function ( row_id ) {
-  return this.domMap.body.querySelector( '[id="'+ row_id +'"]' );
+	return this.domMap.body.querySelector( '[id="'+ row_id +'"]' );
 };
 
 /**
@@ -1893,16 +2129,16 @@ DivTable.prototype.findRowById = function ( row_id ) {
  *  return: [object] of the next row
  */
 DivTable.prototype.findNextRow = function ( id ) {
-  var i, len, next_row,
-      rows = this._getRows();
-    
-    for ( i = 0, len = rows.length; i < len; i++ ) {
-      if ( rows[ i ].id == id ) {
-        next_row = rows[ i + 1 ];
-        break;
-      }
-    }
-    return next_row || {};
+	var i, len, next_row,
+			rows = this._getRows();
+		
+		for ( i = 0, len = rows.length; i < len; i++ ) {
+			if ( rows[ i ].id == id ) {
+				next_row = rows[ i + 1 ];
+				break;
+			}
+		}
+		return next_row || {};
 };
 
 /**
@@ -1911,7 +2147,7 @@ DivTable.prototype.findNextRow = function ( id ) {
  *  return: [number] id of the current table
  */
 DivTable.prototype.getTableId = function () {
-  return this._currentTableId;
+	return this._currentTableId;
 };
 
 /**
@@ -1920,15 +2156,15 @@ DivTable.prototype.getTableId = function () {
  *  return: [array] of ids of the saved tables
  */
 DivTable.prototype.getSavedTables = function () {
-  var table_id,
-    saved = [];
-  
-  for ( table_id in this._saveMap ) {
+	var table_id,
+		saved = [];
+	
+	for ( table_id in this._saveMap ) {
 		if ( this._saveMap.hasOwnProperty( table_id ) ) {
 			saved.push( table_id );
 		}
-  }
-  return saved;
+	}
+	return saved;
 };
 
 /**
@@ -1937,13 +2173,13 @@ DivTable.prototype.getSavedTables = function () {
  *  return: [number] id of the new table
  */
 DivTable.prototype.newTable = function () {
-  this._currentTableId = new Date().getTime();
-  this.table    = TAFFY();
-  this._saveMap[ this._currentTableId ] = this.table;
-  
-  this._updateTable();
-  
-  return this._currentTableId;
+	this._currentTableId = new Date().getTime();
+	this.table    = TAFFY();
+	this._saveMap[ this._currentTableId ] = this.table;
+	
+	this._updateTable();
+	
+	return this._currentTableId;
 };
 
 /**
@@ -1952,15 +2188,15 @@ DivTable.prototype.newTable = function () {
  *  return: [boolean] true if the table has been restored
  */
 DivTable.prototype.restoreTable = function ( table_id ) {
-  var restored = false;
-  if ( this._saveMap.hasOwnProperty( table_id ) ) {
-    this.table           = this._saveMap[ table_id ];
-    this._currentTableId = table_id;
-    restored = true;
-    
-    this._updateTable();
-  }
-  return restored;
+	var restored = false;
+	if ( this._saveMap.hasOwnProperty( table_id ) ) {
+		this.table           = this._saveMap[ table_id ];
+		this._currentTableId = table_id;
+		restored = true;
+		
+		this._updateTable();
+	}
+	return restored;
 };
 
 /**
@@ -1969,12 +2205,12 @@ DivTable.prototype.restoreTable = function ( table_id ) {
  *  return: -
  */
 DivTable.prototype.destroy = function ( table_id ) {
-  if ( this._saveMap.hasOwnProperty( table_id ) ) {
-    if ( this._currentTableId === table_id ) {
-      this.newTable();
-    }
-    delete this._saveMap[ table_id ];
-  }
+	if ( this._saveMap.hasOwnProperty( table_id ) ) {
+		if ( this._currentTableId === table_id ) {
+			this.newTable();
+		}
+		delete this._saveMap[ table_id ];
+	}
 };
 
 
@@ -1985,14 +2221,14 @@ DivTable.prototype.destroy = function ( table_id ) {
  *  return: -
  */
 DivTable.prototype.saveStatus = function () {
-  // Really delete the deleted rows
-  this.table({ deleted : 'true' }).remove();
-  // Make all the rows not new, not edited and not deleted
-  this.table().update({
-    'new'   : 'false', 
-    edited  : 'false', 
-    deleted : 'false'
-  });
+	// Really delete the deleted rows
+	this.table({ deleted : 'true' }).remove();
+	// Make all the rows not new, not edited and not deleted
+	this.table().update({
+		'new'   : 'false', 
+		edited  : 'false', 
+		deleted : 'false'
+	});
 };
 
 /**
@@ -2001,21 +2237,21 @@ DivTable.prototype.saveStatus = function () {
  *  return: [array|object] containing the new rows
  */
 DivTable.prototype.getNewRows = function ( include_saved ) {
-  var id, new_rows,
-    filter     = { 'new' : 'true' },
-    return_map = {};
-  if ( include_saved ) {
-    for ( id in this._saveMap ) {
+	var id, new_rows,
+		filter     = { 'new' : 'true' },
+		return_map = {};
+	if ( include_saved ) {
+		for ( id in this._saveMap ) {
 			if ( this._saveMap.hasOwnProperty( id ) ) {
 				return_map[ id ] = this._saveMap[ id ]( filter ).get();
 			}
 		}
-    new_rows = util.clone( return_map );
-  }
-  else {
-    new_rows = util.clone( this.table( filter ).get() );
-  }
-  return new_rows;
+		new_rows = util.clone( return_map );
+	}
+	else {
+		new_rows = util.clone( this.table( filter ).get() );
+	}
+	return new_rows;
 },
 
 /**
@@ -2024,19 +2260,19 @@ DivTable.prototype.getNewRows = function ( include_saved ) {
  *  return: [array|object] containing the edited rows
  */
 DivTable.prototype.getEditedRows = function ( include_saved ) {
-  var id,
-    filter     = { 'edited' : 'true' },
-    return_map = {};
-  if ( include_saved ) {
-    for ( id in this._saveMap ) {
+	var id,
+		filter     = { 'edited' : 'true' },
+		return_map = {};
+	if ( include_saved ) {
+		for ( id in this._saveMap ) {
 			if ( this._saveMap.hasOwnProperty( id ) ) {
 				return_map[ id ] = this._saveMap[ id ]( filter ).get();
 			}
-    }
-    
-    return util.clone( return_map );
-  }
-  return util.clone( this.table( filter ).get() );
+		}
+		
+		return util.clone( return_map );
+	}
+	return util.clone( this.table( filter ).get() );
 };
 
 /**
@@ -2045,19 +2281,19 @@ DivTable.prototype.getEditedRows = function ( include_saved ) {
  *  return: [array|object] containing the deleted rows
  */
 DivTable.prototype.getDeletedRows = function ( include_saved ) {
-  var id,
-    filter     = { 'deleted' : 'true' },
-    return_map = {};
-  if ( include_saved ) {
-    for ( id in this._saveMap ) {
+	var id,
+		filter     = { 'deleted' : 'true' },
+		return_map = {};
+	if ( include_saved ) {
+		for ( id in this._saveMap ) {
 			if ( this._saveMap.hasOwnProperty( id ) ) {
 				return_map[ id ] = this._saveMap[ id ]( filter ).get();
 			}
-    }
-    
-    return util.clone( return_map );
-  }
-  return util.clone( this.table( filter ).get() );
+		}
+		
+		return util.clone( return_map );
+	}
+	return util.clone( this.table( filter ).get() );
 };
 
 /**
@@ -2066,239 +2302,262 @@ DivTable.prototype.getDeletedRows = function ( include_saved ) {
  *  return: [boolean] true if at least one row is created, changed or deleted
  */
 DivTable.prototype.isStatusChanged = function ( include_saved ) {
-  var i, len, key, current, fn,
-    functions = [ 'getNewRows', 'getEditedRows', 'getDeletedRows' ],
-    count = 0;
-  if ( include_saved ) {
-    for ( i = 0, len = functions.length; i < len; ++i ) {
-      fn = functions[ i ];
-      current = this[ fn ]( include_saved );
-      for ( key in current ) {
+	var i, len, key, current, fn,
+		functions = [ 'getNewRows', 'getEditedRows', 'getDeletedRows' ],
+		count = 0;
+	if ( include_saved ) {
+		for ( i = 0, len = functions.length; i < len; ++i ) {
+			fn = functions[ i ];
+			current = this[ fn ]( include_saved );
+			for ( key in current ) {
 				if ( current.hasOwnProperty( key ) ) {
 					count += current[ key ].length;
 				}
-      }
-    }
-    return count;
-  }
-  return (
-    ( this.getNewRows    ().length
-    + this.getEditedRows ().length
-    + this.getDeletedRows().length ) > 0 );
-    
+			}
+		}
+		return count;
+	}
+	return (
+		( this.getNewRows    ().length
+		+ this.getEditedRows ().length
+		+ this.getDeletedRows().length ) > 0 );
+		
 };
 
 /**
  * Extend the prototype of the table
  */
 DivTable.prototype.extend = function ( name, fn ) {
-  var old_fn = DivTable.prototype[ name ];
-	DivTable.prototype[ name ] = fn;
-	if ( old_fn ) {
-	  DivTable.prototype[ name ]._super = old_fn;
-	}
+	var _super = DivTable.prototype[ name ];
+	DivTable.prototype[ name ] = function () {
+		this._super = _super;
+		fn.apply( this, arguments );
+	};
+};
+
+/**
+ * Bind an event to the resize of the table
+ * to be used in the pagination mode to
+ * recalculate the count of rows pro page
+ */
+DivTable.prototype.bindResize = function ( element, event ) {
+	util.addEvent( element, event, util.reduce( this._onResize.bind(this) ) );
 };
 
 /**
  * Utility used by the div table
  */
 var util = {
-  /**
-   * Returns the size of the scrollbar
-   */
-  getScrollWidth : function () {
-    var outer, inner, widthNoScroll, widthWithScroll;
-    
-    outer = document.createElement('div');
-    outer.style.visibility = 'hidden';
-    outer.style.width = '100px';
-    outer.style.msOverflowStyle = 'scrollbar'; // needed for WinJS apps
+	/**
+	 * Returns the size of the scrollbar
+	 */
+	getScrollWidth : function () {
+		var outer, inner, widthNoScroll, widthWithScroll;
+		
+		outer = document.createElement('div');
+		outer.style.visibility = 'hidden';
+		outer.style.width = '100px';
+		outer.style.msOverflowStyle = 'scrollbar'; // needed for WinJS apps
 
-    document.body.appendChild(outer);
+		document.body.appendChild(outer);
 
-    widthNoScroll = outer.offsetWidth;
-    // force scrollbars
-    outer.style.overflow = 'scroll';
+		widthNoScroll = outer.offsetWidth;
+		// force scrollbars
+		outer.style.overflow = 'scroll';
 
-    // add innerdiv
-    inner = document.createElement('div');
-    inner.style.width = '100%';
-    outer.appendChild(inner);        
+		// add innerdiv
+		inner = document.createElement('div');
+		inner.style.width = '100%';
+		outer.appendChild(inner);        
 
-    widthWithScroll = inner.offsetWidth;
+		widthWithScroll = inner.offsetWidth;
 
-    // remove divs
-    outer.parentNode.removeChild(outer);
+		// remove divs
+		outer.parentNode.removeChild(outer);
 
-    return widthNoScroll - widthWithScroll;
-  },
-  
-  /**
-   * Object and Array functions
-   */
-  inArray : function ( element, array ) {
-    var i, len;
-    
-    if ( Object.prototype.toString.call( array ) === '[object Array]' ) {
-      for ( i = 0, len = array.length; i < len; ++i ) {
-        if ( ''+ element === ''+ array[ i ] ) {
-          return true;
-        }
-      }
-    }
-    
-    return false;
-  },
+		return widthNoScroll - widthWithScroll;
+	},
+	
+	/**
+	 * Object and Array functions
+	 */
+	inArray : function ( element, array ) {
+		var i, len;
+		
+		if ( Object.prototype.toString.call( array ) === '[object Array]' ) {
+			for ( i = 0, len = array.length; i < len; ++i ) {
+				if ( ''+ element === ''+ array[ i ] ) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	},
 
-  extend : function ( obj1, obj2 ) {
-    var
-      key,
-      extended = {};
-      
-    for ( key in obj1 ) {
-      if ( obj1.hasOwnProperty( key ) ) {
-        extended[ key ] = obj1[ key ];
-      }
-    }
-    for ( key in obj2 ) {
-      if ( obj2.hasOwnProperty( key ) ) {
-        extended[ key ] = obj2[ key ];
-      }
-    }
-    return extended;
-  },
+	extend : function ( obj1, obj2 ) {
+		var
+			key,
+			extended = {};
+			
+		for ( key in obj1 ) {
+			if ( obj1.hasOwnProperty( key ) ) {
+				extended[ key ] = obj1[ key ];
+			}
+		}
+		for ( key in obj2 ) {
+			if ( obj2.hasOwnProperty( key ) ) {
+				extended[ key ] = obj2[ key ];
+			}
+		}
+		return extended;
+	},
 
-  getType : function ( obj ) {
-    return Object.prototype.toString.call( obj );
-  },
-  
-  isObject : function ( o ) {
-    return util.getType( o ) === '[object Object]';
-  },
-  
-  isArray : function ( o ) {
-    return util.getType( o ) === '[object Array]';
-  },
+	getType : function ( obj ) {
+		return Object.prototype.toString.call( obj );
+	},
+	
+	isObject : function ( o ) {
+		return util.getType( o ) === '[object Object]';
+	},
+	
+	isArray : function ( o ) {
+		return util.getType( o ) === '[object Array]';
+	},
 
-  clone : function ( o ) {
-    var i, len, obj;
-    
-    if ( util.isArray( o ) ) {
-      obj = [];
-      
-      for ( i = 0, len = o.length; i < len; ++i ) {
-        if ( util.isArray( o[ i ] ) || util.isObject( o[ i ] ) ) {
-          obj[ i ] = util.clone ( o[ i ] );
-        }
-        else {
-          obj[ i ] = o[ i ];
-        }
-      }
-      
-      return obj;
-    }
-    else if ( util.isObject( o ) ) {
-      obj = {};
-      
-      for ( i in o ) {
-        if ( ! o.hasOwnProperty( i ) ) { continue; }
-      
-        if ( util.isArray( o[ i ] ) || util.isObject( o[ i ] ) ) {
-          obj[ i ] = util.clone ( o[ i ] );
-        }
-        else {
-          obj[ i ] = o[ i ];
-        }
-      }
-      
-      return obj;
-    }
-    else {
-      return o;
-    }
-  },
+	clone : function ( o ) {
+		var i, len, obj;
+		
+		if ( util.isArray( o ) ) {
+			obj = [];
+			
+			for ( i = 0, len = o.length; i < len; ++i ) {
+				if ( util.isArray( o[ i ] ) || util.isObject( o[ i ] ) ) {
+					obj[ i ] = util.clone ( o[ i ] );
+				}
+				else {
+					obj[ i ] = o[ i ];
+				}
+			}
+			
+			return obj;
+		}
+		else if ( util.isObject( o ) ) {
+			obj = {};
+			
+			for ( i in o ) {
+				if ( ! o.hasOwnProperty( i ) ) { continue; }
+			
+				if ( util.isArray( o[ i ] ) || util.isObject( o[ i ] ) ) {
+					obj[ i ] = util.clone ( o[ i ] );
+				}
+				else {
+					obj[ i ] = o[ i ];
+				}
+			}
+			
+			return obj;
+		}
+		else {
+			return o;
+		}
+	},
 
-  getArrayByKey : function ( obj, key ) {
-    var
-      i, len,
-      array = [];
-      
-    for ( i = 0, len = obj.length; i < len; ++i ) {
-      if ( obj[ i ].hasOwnProperty( key ) ) {
-        array.push( obj[ i ][ key] );
-      }
-    }
-    
-    return array;
-  },
-  
-  inherit : function ( obj ) {
-    function F(){}
-    F.prototype = obj;
-    return new F();
-  },
-  
-  /**
-   * Event handler management
-   */
-  addEvent : (function( window, document ) {
-    if ( document.addEventListener ) { 
-      return function( elem, type, cb ) {
-        if ( (elem && !elem.length) || elem === window ) {
-          elem.addEventListener(type, cb, false ); 
-        } 
-        else if ( elem && elem.length ) { 
-          var len = elem.length; 
-          for ( var i = 0; i < len; i++ ) { 
-            util.addEvent( elem[i], type, cb ); 
-          } 
-        } 
-      }; 
-    } 
-    else if ( document.attachEvent ) { 
-      return function ( elem, type, cb ) { 
-        if ( (elem && !elem.length) || elem === window ) { 
-          elem.attachEvent( 'on' + type, function() { return cb.call(elem, window.event); } ); 
-        } 
-        else if ( elem.length ) { 
-          var len = elem.length; 
-          for ( var i = 0; i < len; i++ ) { 
-            util.addEvent( elem[i], type, cb ); 
-          } 
-        } 
-      }; 
-    } 
-  })( this, document ),
-  
-  removeEvent : (function( window, document ) {
-    if ( document.removeEventListener ) { 
-      return function( elem, type, cb ) { 
-        if ( (elem && !elem.length) || elem === window ) { 
-          elem.removeEventListener(type, cb, false ); 
-        } 
-        else if ( elem && elem.length ) { 
-          var len = elem.length; 
-          for ( var i = 0; i < len; i++ ) { 
-            util.removeEvent( elem[i], type, cb ); 
-          } 
-        } 
-      }; 
-    } 
-    else if ( document.detachEvent ) { 
-      return function ( elem, type, cb ) { 
-        if ( (elem && !elem.length) || elem === window ) { 
-          elem.detachEvent( 'on' + type, function() { return cb.call(elem, window.event); } ); 
-        } 
-        else if ( elem.length ) { 
-          var len = elem.length; 
-          for ( var i = 0; i < len; i++ ) { 
-            util.removeEvent( elem[i], type, cb ); 
-          } 
-        } 
-      }; 
-    } 
-  })( this, document )
-  
+	getArrayByKey : function ( obj, key ) {
+		var
+			i, len,
+			array = [];
+			
+		for ( i = 0, len = obj.length; i < len; ++i ) {
+			if ( obj[ i ].hasOwnProperty( key ) ) {
+				array.push( obj[ i ][ key] );
+			}
+		}
+		
+		return array;
+	},
+	
+	inherit : function ( obj ) {
+		function F(){}
+		F.prototype = obj;
+		return new F();
+	},
+	
+	/**
+	 * Event handler management
+	 */
+	addEvent : (function( window, document ) {
+		if ( document.addEventListener ) { 
+			return function( elem, type, cb ) {
+				if ( (elem && !elem.length) || elem === window ) {
+					elem.addEventListener(type, cb, false ); 
+				} 
+				else if ( elem && elem.length ) { 
+					var len = elem.length; 
+					for ( var i = 0; i < len; i++ ) { 
+						util.addEvent( elem[i], type, cb ); 
+					} 
+				} 
+			}; 
+		} 
+		else if ( document.attachEvent ) { 
+			return function ( elem, type, cb ) { 
+				if ( (elem && !elem.length) || elem === window ) { 
+					elem.attachEvent( 'on' + type, function() { return cb.call(elem, window.event); } ); 
+				} 
+				else if ( elem.length ) { 
+					var len = elem.length; 
+					for ( var i = 0; i < len; i++ ) { 
+						util.addEvent( elem[i], type, cb ); 
+					} 
+				} 
+			}; 
+		} 
+	})( this, document ),
+	
+	removeEvent : (function( window, document ) {
+		if ( document.removeEventListener ) { 
+			return function( elem, type, cb ) { 
+				if ( (elem && !elem.length) || elem === window ) { 
+					elem.removeEventListener(type, cb, false ); 
+				} 
+				else if ( elem && elem.length ) { 
+					var len = elem.length; 
+					for ( var i = 0; i < len; i++ ) { 
+						util.removeEvent( elem[i], type, cb ); 
+					} 
+				} 
+			}; 
+		} 
+		else if ( document.detachEvent ) { 
+			return function ( elem, type, cb ) { 
+				if ( (elem && !elem.length) || elem === window ) { 
+					elem.detachEvent( 'on' + type, function() { return cb.call(elem, window.event); } ); 
+				} 
+				else if ( elem.length ) { 
+					var len = elem.length; 
+					for ( var i = 0; i < len; i++ ) { 
+						util.removeEvent( elem[i], type, cb ); 
+					} 
+				} 
+			}; 
+		} 
+	})( this, document ),
+	
+	reduce : function ( fn, interval ) {
+		var in_hold;
+
+		return function () {
+			if ( in_hold ) { return; }
+			in_hold = true;
+
+			setTimeout(function () {
+				in_hold = false;
+			}, interval || 20 );
+			fn.apply( this, arguments );
+		}
+	}
+	
 };
 
 
@@ -2306,29 +2565,29 @@ var util = {
  * Return the constructor function
  */
 return function ( container, options ) {
-  var table,
-    context = function () {};
-  
-  context.div_table = function () {
-    var result,
-      fn_name = [].shift.apply( arguments );
-    if ( fn_name[ 0 ] === '_' ) {
-      throw 'You can\'t call the private method! '+ fn_name;
-    }
-    else if ( typeof table[ fn_name ] === 'function' ) {
-      result = table[ fn_name ].apply( table, arguments );
-      //console.log( 'div_table', fn_name, arguments, 'resutl:', result );
-      return result;
-    }
-    else {
-      console.warn( fn_name, 'is not a callable function' );
-    }
-  };
-  
-  table = new DivTable();
-  table.init( container, options, context );
-  
-  return context;
+	var table,
+		context = function () {};
+	
+	context.div_table = function () {
+		var result,
+			fn_name = [].shift.apply( arguments );
+		if ( fn_name[ 0 ] === '_' ) {
+			throw 'You can\'t call the private method! '+ fn_name;
+		}
+		else if ( typeof table[ fn_name ] === 'function' ) {
+			result = table[ fn_name ].apply( table, arguments );
+			//console.log( 'div_table', fn_name, arguments, 'resutl:', result );
+			return result;
+		}
+		else {
+			console.warn( fn_name, 'is not a callable function' );
+		}
+	};
+	
+	table = new DivTable();
+	table.init( container, options, context );
+	
+	return context;
 };
 
 })();
