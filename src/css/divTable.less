@@ -118,9 +118,12 @@
   height : 25px;
   padding-left : 2px;
   background-color : #8c9397;
+  text-align: center;
+  position: relative;
 }
 
 .div-footer-button {
+  z-index: 2;
   display : inline-block;
   background : none;
   border : 0px;
@@ -132,6 +135,13 @@
 .div-footer-button:hover {
   background-color : #aaa;
   cursor : pointer;
+}
+
+.div-footer-button.div-disable,
+.div-footer-button.div-disable:hover {
+  background : none;
+  opacity    : 0.3;
+  cursor     : default;
 }
 
 .div-footer-counter {
@@ -184,3 +194,53 @@
   background-position: -176px -96px;
 }
 
+.ui-icon-seek-first {
+  background-position: -80px -160px;
+}
+
+.ui-icon-seek-prev {
+  background-position: -48px -160px;
+}
+
+.ui-icon-seek-next {
+  background-position: -32px -160px;
+}
+
+.ui-icon-seek-end {
+  background-position: -64px -160px;
+}
+
+
+/**
+ * Pagination style
+ */
+.div-pages,
+.div-pages > div {
+  display: inline-block;
+  float: none;
+  color: #fff;
+}
+
+.div-pages {
+  height: 100%;
+  position: absolute;
+  left: 0px;
+  right: 0px;
+}
+
+.div-pages-curr {
+  vertical-align: top;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.div-pages-curr > div {
+  display: inline-block;
+  margin-right: 2px;
+  margin-left:  2px;
+}
+
+.div-pages-curr-input {
+  width: 27px;
+}
