@@ -111,8 +111,13 @@ DivTable.prototype._loadOptions = function ( config_options ) {
       
       advancedEdit : null,
       
-      onChange    : function ( name, new_val, row ) {},
-      onSelectRow : function ( row ) {}
+      onChange      : function ( name, new_val, row ) {},
+      onSelectRow   : function ( row ) {},
+      onFooterClick : function ( name ) {
+        if      ( name === 'plus'    ) { this.bag_table( 'newRow'        ); }
+        else if ( name === 'trash'   ) { this.bag_table( 'deleteEditRow' ); }
+        else if ( name === 'refresh' ) { this.bag_table( 'updateTable'   ); }
+      }
     };
   
   for ( key in default_options ) {
