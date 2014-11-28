@@ -153,6 +153,59 @@ table = divTableMaker( advTable, {
 
 
 			<h3></h3>
+			<h2>Sobstitute scroll with pages:</h2>
+
+			<style>
+				#pagTable {
+					width  : 100%;
+					height : 300px;
+				}
+
+				#pagTable .cell-0,
+				#pagTable .cell-1,
+				#pagTable .cell-2,
+				#pagTable .cell-3,
+				#pagTable .cell-4 {
+					width : 20%;
+				}
+			</style>
+			<div id="pagTable"></div>
+			<h2></h2>
+
+			<div class="code">
+<h4>Javascript:</h4>
+				<pre class="code-js" >
+advTable  = document.getElementById( 'advTable'  );
+table = divTableMaker( pagTable, {
+	columns : [
+		{ name : 'text',           text : 'Text',            edit : 'text'                                },
+		{ name : 'number',         text : 'Number',          edit : 'number'                              },
+		{ name : 'select',         text : 'Select',          edit : [ '0', '1', '2' ]                     },
+		{ name : 'advancedSelect', text : 'Advanced Select', edit : {1: 'first', 2: 'second', 3: 'third'} },
+		{ name : 'checkbox',       text : 'Checkbox',        edit : 'checkbox'                            }
+	],
+	
+	pagination: true
+});
+				</pre>
+<h4>CSS:</h4>
+				<pre class="code-css">
+#pagTable {
+	width  : 100%;
+	height : 300px;
+}
+
+#pagTable .cell-0,
+#pagTable .cell-1,
+#pagTable .cell-2,
+#pagTable .cell-3,
+#pagTable .cell-4 {
+	width : 20%;
+}
+				</pre>
+			</div>
+
+			<h3></h3>
 			<h3>
 			<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
 
@@ -181,6 +234,7 @@ table = divTableMaker( advTable, {
 		var table,
 			baseTable = document.getElementById( 'baseTable' ),
 			advTable  = document.getElementById( 'advTable'  );
+			pagTable  = document.getElementById( 'pagTable'  );
 
 		table = divTableMaker( baseTable, {
 			columns : [
@@ -219,6 +273,19 @@ table = divTableMaker( advTable, {
 			}
 		});
 		table.div_table( 'newRow' );
+
+		table = divTableMaker( pagTable, {
+			columns : [
+				{ name : 'text',           text : 'Text',            edit : 'text'                                },
+				{ name : 'number',         text : 'Number',          edit : 'number'                              },
+				{ name : 'select',         text : 'Select',          edit : [ '0', '1', '2' ]                     },
+				{ name : 'advancedSelect', text : 'Advanced Select', edit : {1: 'first', 2: 'second', 3: 'third'} },
+				{ name : 'checkbox',       text : 'Checkbox',        edit : 'checkbox'                            }
+			],
+
+			pagination : true
+		});
+
 	</script>
 
 	</body>
