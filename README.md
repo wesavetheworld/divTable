@@ -21,11 +21,7 @@ How use divTable
   height : 300px;
 }
 
-.cell-0,
-.cell-1,
-.cell-2,
-.cell-3,
-.cell-4 {
+.cell-0, .cell-1, .cell-2, .cell-3, .cell-4 {
   width : 20%;
 }
 ```
@@ -37,12 +33,11 @@ var table,
 
 table = divTableMaker( table_test, {
   columns : [
-		{ name : 'text',           text : 'Text',            edit : 'text'                                },
-		{ name : 'number',         text : 'Number',          edit : 'number'                              },
-		{ name : 'select',         text : 'Select',          edit : [ '0', '1', '2' ]                     },
-		{ name : 'advancedSelect', text : 'Advanced Select', edit : {1: 'first', 2: 'second', 3: 'third'} },
-		{ name : 'checkbox',       text : 'Checkbox',        edit : 'checkbox'                            }
-	]
+    { name : 'text',           text : 'Text',            edit : 'text'                                },
+    { name : 'number',         text : 'Number',          edit : 'number'                              },
+    { name : 'select',         text : 'Select',          edit : [ '0', '1', '2' ]                     },
+    { name : 'advancedSelect', text : 'Advanced Select', edit : {1: 'first', 2: 'second', 3: 'third'} },
+    { name : 'checkbox',       text : 'Checkbox',        edit : 'checkbox'                            }	]
 });
 ```
 
