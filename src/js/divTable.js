@@ -1289,7 +1289,9 @@ DivTable.prototype._buildTableStructure = function ( container ) {
 	/**
 	 * Fix the size of the header and of the filter button
 	 */
-	container.style.position = 'relative';
+	if ( container.style.position === 'normal' ) {
+		container.style.position = 'relative';
+	}
 	
 	header = container.querySelector( '.'+ prefix +'-header' );
 	header.style.width = '-webkit-calc(100% - '+ scroll_w +'px)';
@@ -2205,6 +2207,9 @@ DivTable.prototype.restoreTable = function ( table_id ) {
  *  return: -
  */
 DivTable.prototype.destroy = function ( table_id ) {
+	if ( ! table_id ) {
+		table_id = this._currentTableId;
+	}
 	if ( this._saveMap.hasOwnProperty( table_id ) ) {
 		if ( this._currentTableId === table_id ) {
 			this.newTable();
